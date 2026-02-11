@@ -3,619 +3,604 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HD Onboarding - Official</title>
+  <title>HD Onboarding Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
+      /* Dashboard Palette */
+      --sidebar-bg: #0f172a;
+      --sidebar-text: #94a3b8;
+      --sidebar-active: #ffffff;
+      --bg: #f1f5f9; /* Light gray app background */
+      --surface: #ffffff;
+      
       --primary: #2563eb;
-      --primary-dark: #1e40af;
-      --secondary: #64748b;
-      --bg: #f8fafc;
-      --card-bg: #ffffff;
-      --border: #cbd5e1;
-      --leader-color: #ef4444;
-      --gen-color: #3b82f6;
-      --doc-color: #10b981;
-      --column-even: #f1f5f9;
-      --column-odd: #ffffff;
-      --line: #cbd5e1;
-      --arrow: #94a3b8;
+      --leader: #ef4444;
+      --general: #3b82f6;
+      --docs: #10b981;
+      
+      --border: #e2e8f0;
     }
 
     body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      background-color: var(--bg);
+      font-family: 'Inter', sans-serif;
       margin: 0;
       padding: 0;
-      color: #1e293b;
+      background-color: var(--bg);
       height: 100vh;
       display: flex;
-      flex-direction: column;
-      overflow: hidden;
+      overflow: hidden; /* App-like structure */
     }
 
-    /* --- Header --- */
-    .header-controls {
-      background: white;
-      padding: 12px 24px;
-      border-bottom: 1px solid var(--border);
+    /* --- 1. SIDEBAR --- */
+    .sidebar {
+      width: 260px;
+      background: var(--sidebar-bg);
+      color: var(--sidebar-text);
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      z-index: 50;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+      flex-direction: column;
       flex-shrink: 0;
     }
 
-    /* --- Brand / Logo Section --- */
-    .brand-container {
+    .brand-area {
+      height: 70px;
       display: flex;
       align-items: center;
-      gap: 16px;
+      padding: 0 24px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      gap: 12px;
     }
 
-    .hd-logo {
-      height: 45px;
-      width: auto;
-      object-fit: contain;
-    }
+    .brand-logo { height: 32px; width: auto; }
+    .brand-text { color: white; font-weight: 700; font-size: 1.1rem; letter-spacing: -0.5px; }
 
-    .title-block h1 { margin: 0; font-size: 1.25rem; color: #0f172a; }
-    .title-block p { margin: 2px 0 0; color: var(--secondary); font-size: 0.8rem; }
+    .nav-menu { padding: 24px 16px; flex: 1; }
+    .nav-label { font-size: 0.7rem; text-transform: uppercase; font-weight: 700; letter-spacing: 1px; margin-bottom: 12px; padding-left: 12px; }
 
-    .center-controls { display: flex; align-items: center; gap: 20px; }
-    
-    .legend { display: flex; gap: 15px; font-size: 0.75rem; color: var(--secondary); border-right: 1px solid var(--border); padding-right: 20px; }
-    .legend-item { display: flex; align-items: center; gap: 6px; }
-    .dot { width: 8px; height: 8px; border-radius: 50%; }
-    .dot.gen { background: var(--gen-color); }
-    .dot.lead { background: var(--leader-color); }
-    .dot.doc { background: var(--doc-color); }
-
-    .btn-group { display: flex; gap: 5px; background: #f1f5f9; padding: 4px; border-radius: 8px; }
-    
-    button.filter-btn {
-      padding: 6px 12px; border: 1px solid transparent; background: transparent;
-      border-radius: 6px; cursor: pointer; font-size: 0.8rem; font-weight: 600;
-      color: var(--secondary); transition: all 0.2s;
-    }
-    button.filter-btn:hover { background: rgba(255,255,255,0.6); }
-    button.filter-btn.active { background: white; color: var(--primary); box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-color: #e2e8f0; }
-
-    .action-btn {
-        background: var(--primary); color: white; border: none; padding: 8px 16px;
-        border-radius: 6px; font-size: 0.85rem; font-weight: 600; cursor: pointer;
-        box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
-    }
-    .action-btn:hover { background: var(--primary-dark); }
-    .reset-btn { background: transparent; color: var(--secondary); border: 1px solid var(--border); box-shadow: none; }
-    .reset-btn:hover { background: #f1f5f9; color: #ef4444; border-color: #ef4444; }
-
-    /* --- Main Scrollable Area --- */
-    .diagram-wrapper {
-      flex: 1;
-      overflow: auto; /* X and Y scroll handled here */
-      position: relative;
-      background: var(--bg);
-      scroll-behavior: smooth;
-    }
-
-    /* --- The Grid System --- */
-    .grid-container {
+    .nav-item {
       display: flex;
-      min-width: 1600px; /* Force horizontal scroll */
-      min-height: calc(100% - 80px); /* Leave room for footer */
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-bottom: 4px;
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+
+    .nav-item:hover { background: rgba(255,255,255,0.05); color: white; }
+    .nav-item.active { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(37,99,235,0.3); }
+
+    .user-profile {
+      padding: 20px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .avatar { width: 36px; height: 36px; background: #334155; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 0.8rem; }
+    .user-info div:first-child { color: white; font-size: 0.85rem; font-weight: 600; }
+    .user-info div:last-child { font-size: 0.75rem; }
+
+    /* --- 2. MAIN CONTENT --- */
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Top Bar */
+    .top-bar {
+      height: 70px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 32px;
+    }
+
+    .page-title h2 { margin: 0; font-size: 1.25rem; color: #0f172a; }
+    .page-title span { color: #64748b; font-size: 0.9rem; font-weight: 400; margin-left: 10px; }
+
+    .top-actions { display: flex; gap: 12px; }
+    .action-btn {
+      background: var(--primary); color: white; border: none; padding: 8px 16px;
+      border-radius: 6px; font-weight: 600; font-size: 0.85rem; cursor: pointer;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .action-btn.secondary { background: white; border: 1px solid var(--border); color: #475569; }
+    .action-btn:hover { transform: translateY(-1px); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+
+    /* Metrics Row */
+    .stats-row {
+      padding: 24px 32px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+    }
+    
+    .stat-card {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+    }
+    .stat-label { font-size: 0.75rem; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; }
+    .stat-value { font-size: 1.8rem; font-weight: 700; color: #0f172a; margin-top: 5px; }
+    .stat-indicator { height: 4px; width: 40px; border-radius: 2px; margin-top: 12px; }
+
+    /* Timeline Wrapper */
+    .dashboard-view {
+      flex: 1;
+      overflow: auto; /* Scroll happens here */
+      padding: 0 32px 32px 32px; /* Margins around the chart */
       position: relative;
     }
 
+    .chart-surface {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      min-width: 1600px; /* Force scroll */
+      min-height: 100%;
+      position: relative;
+      overflow: hidden; /* Clip contents */
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .grid-body {
+      flex: 1;
+      display: flex;
+      position: relative;
+    }
+
+    /* Columns & Cards (Reused styles, refined) */
     .time-column {
       flex: 1;
-      min-width: 200px;
       border-right: 1px dashed var(--border);
-      display: flex; flex-direction: column;
-      padding: 60px 20px 20px 20px;
-      gap: 30px;
+      padding: 60px 15px 20px 15px;
+      display: flex; flex-direction: column; gap: 20px;
       position: relative;
     }
-
-    .time-column:nth-child(even) { background-color: var(--column-even); }
-    .time-column:nth-child(odd) { background-color: var(--column-odd); }
-
-    .col-header {
-      position: absolute; top: 0; left: 0; width: 100%;
-      text-align: center; padding: 20px 0;
-      font-weight: 800; text-transform: uppercase; font-size: 0.85rem;
-      color: #334155; border-bottom: 1px solid rgba(0,0,0,0.05);
-      background: inherit; z-index: 5;
+    .time-column:nth-child(even) { background: #fafafa; }
+    .col-header { 
+      position: absolute; top: 0; left: 0; width: 100%; text-align: center; padding: 20px 0;
+      font-weight: 700; color: #475569; font-size: 0.8rem; text-transform: uppercase;
+      border-bottom: 1px solid var(--border);
     }
 
-    /* --- Cards --- */
     .node-card {
-      background: white; border: 1px solid var(--border); border-radius: 8px;
-      padding: 14px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-      transition: all 0.2s; cursor: pointer; position: relative; z-index: 10;
+      background: white; border: 1px solid var(--border); border-radius: 8px; padding: 16px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.03); transition: all 0.2s; cursor: pointer; position: relative; z-index: 10;
     }
-    .node-card:hover { transform: translateY(-4px) scale(1.01); box-shadow: 0 12px 20px -5px rgba(0, 0, 0, 0.1); border-color: var(--primary); }
-    .node-card.leader { border-left: 4px solid var(--leader-color); }
-    .node-card.general { border-left: 4px solid var(--gen-color); }
-    .node-card.docs { border-left: 4px solid var(--doc-color); }
-    .node-card.active-card { ring: 2px solid var(--primary); box-shadow: 0 0 0 4px rgba(37,99,235,0.1); }
-
-    .node-title { font-weight: 700; font-size: 0.9rem; margin-bottom: 5px; }
-    .node-meta { font-size: 0.75rem; color: var(--secondary); line-height: 1.4; }
-    .stack-badge { background: #fef2f2; color: #dc2626; padding: 2px 6px; border-radius: 4px; font-size: 0.65rem; display: inline-block; margin-top: 8px; font-weight: 700; }
+    .node-card:hover { transform: translateY(-3px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); border-color: var(--primary); }
+    .node-card.leader { border-left: 4px solid var(--leader); }
+    .node-card.general { border-left: 4px solid var(--general); }
+    .node-card.docs { border-left: 4px solid var(--docs); }
     
-    .delete-step-btn {
-        position: absolute; top: 5px; right: 5px; width: 20px; height: 20px;
-        background: #fee2e2; color: #ef4444; border-radius: 50%; border: none;
-        display: flex; align-items: center; justify-content: center; cursor: pointer;
-        font-size: 12px; opacity: 0; transition: opacity 0.2s;
+    .node-title { font-weight: 700; font-size: 0.9rem; color: #1e293b; margin-bottom: 4px; }
+    .node-meta { font-size: 0.75rem; color: #64748b; line-height: 1.4; }
+
+    /* Sticky Checkpoints (Bottom of Chart Surface) */
+    .checkpoints-sticky {
+      position: sticky; bottom: 0; left: 0; width: 100%; height: 70px;
+      background: white; border-top: 2px solid var(--primary);
+      display: flex; z-index: 100; box-shadow: 0 -4px 20px rgba(0,0,0,0.05);
     }
-    .node-card:hover .delete-step-btn { opacity: 1; }
-
-    /* --- SVG Layer --- */
-    #svg-layer { position: absolute; top: 0; left: 0; pointer-events: none; z-index: 8; }
-
-    /* --- Checkpoints Footer (Sticky Fix) --- */
-    .checkpoints-bar {
-      position: sticky; /* Fixes Edge scrolling issue */
-      bottom: 0;
-      left: 0;
-      min-width: 1600px; /* Must match grid width */
-      height: 80px;
-      display: flex;
-      background: #ffffff; /* Solid white */
-      border-top: 2px solid #e2e8f0;
-      z-index: 100;
-      box-shadow: 0 -4px 12px rgba(0,0,0,0.05);
-    }
-
-    .check-label-container {
-        position: sticky; /* Keeps label visible while scrolling right */
-        left: 0;
-        width: 140px;
-        background: white;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        padding-left: 24px;
-        font-weight: 800;
-        color: var(--primary);
-        text-transform: uppercase;
-        font-size: 0.75rem;
-        z-index: 102;
-        border-right: 1px solid #f1f5f9;
-        box-shadow: 4px 0 10px rgba(255,255,255,1);
+    
+    .check-label-box {
+      position: sticky; left: 0; width: 140px; background: white; z-index: 102;
+      display: flex; flex-direction: column; justify-content: center; padding-left: 24px;
+      border-right: 1px solid var(--border); box-shadow: 4px 0 10px rgba(255,255,255,0.8);
+      color: var(--primary); font-weight: 800; font-size: 0.7rem; text-transform: uppercase;
     }
 
     .check-col {
-      flex: 1; display: flex; flex-direction: column;
-      justify-content: center; align-items: center;
-      font-size: 0.75rem; color: var(--secondary);
-      border-right: 1px dashed #f1f5f9;
-      position: relative;
+      flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      border-right: 1px dashed var(--border); position: relative;
     }
-
-    /* Progress Line Background */
-    .progress-line-bg {
-        position: absolute; top: 28px; left: 0; width: 100%; height: 2px;
-        background: #e2e8f0; z-index: 1;
-    }
-    /* Progress Line Fill */
-    .progress-line-fill {
-        position: absolute; top: 28px; left: 0; width: 0%; height: 2px;
-        background: var(--primary); z-index: 2; transition: width 0.4s ease;
-    }
-    /* Active modifier for fill */
-    .check-col.filled .progress-line-fill { width: 100%; }
-
-    .check-dot {
-      width: 14px; height: 14px;
-      background: white; border: 2px solid #cbd5e1; border-radius: 50%;
-      margin-bottom: 8px; z-index: 3; transition: all 0.3s;
-      position: relative;
-    }
-
-    /* Active State for Dot */
-    .check-col.filled .check-dot {
-        background: var(--primary); border-color: var(--primary);
-        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.2);
-    }
-    .check-col.filled { color: var(--primary); font-weight: 600; }
-
-    /* --- Popover --- */
-    .popover {
-      position: absolute; background: white; width: 280px; padding: 20px;
-      border-radius: 12px; box-shadow: 0 20px 50px -10px rgba(0,0,0,0.25);
-      border: 1px solid var(--border); z-index: 200;
-      opacity: 0; transform: translateY(10px) scale(0.96); pointer-events: none;
-      transition: opacity 0.15s, transform 0.15s;
-    }
-    .popover.active { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
-    .popover::after {
-      content: ''; position: absolute; top: 20px; left: -8px; width: 16px; height: 16px;
-      background: white; border-left: 1px solid var(--border); border-bottom: 1px solid var(--border);
-      transform: rotate(45deg);
-    }
-    .popover.flip-left::after { left: auto; right: -8px; border-left: none; border-bottom: none; border-top: 1px solid var(--border); border-right: 1px solid var(--border); }
-    .popover h4 { margin: 0 0 10px 0; color: var(--primary); font-size: 1rem; }
     
-    .popover-content { font-size: 0.85rem; color: #334155; line-height: 1.6; max-height: 250px; overflow-y: auto; }
-    /* Concise Bullet Styling */
-    .popover-content ul { margin: 0; padding-left: 20px; }
+    .progress-bar { position: absolute; top: 25px; left: 0; width: 100%; height: 2px; background: #e2e8f0; z-index: 1; }
+    .progress-fill { position: absolute; top: 25px; left: 0; width: 0%; height: 2px; background: var(--primary); z-index: 2; transition: width 0.3s; }
+    .check-dot { width: 12px; height: 12px; background: white; border: 2px solid #cbd5e1; border-radius: 50%; z-index: 3; margin-bottom: 6px; position: relative; transition: all 0.3s; }
+    .check-col.active .check-dot { background: var(--primary); border-color: var(--primary); transform: scale(1.2); }
+    .check-col.active .progress-fill { width: 100%; }
+
+    /* SVG Layer */
+    #svg-layer { position: absolute; top: 0; left: 0; pointer-events: none; z-index: 5; }
+
+    /* Popover */
+    .popover {
+      position: absolute; background: white; width: 300px; padding: 24px;
+      border-radius: 12px; box-shadow: 0 20px 60px -10px rgba(0,0,0,0.3);
+      border: 1px solid var(--border); z-index: 200; opacity: 0; pointer-events: none;
+      transform: translateY(10px); transition: all 0.2s;
+    }
+    .popover.visible { opacity: 1; pointer-events: auto; transform: translateY(0); }
+    .popover h4 { margin: 0 0 12px 0; color: var(--primary); font-size: 1.1rem; }
+    .popover-content ul { padding-left: 20px; margin: 0; color: #475569; font-size: 0.85rem; line-height: 1.6; }
     .popover-content li { margin-bottom: 6px; }
 
-    .popover-meta { margin-top: 15px; padding-top: 10px; border-top: 1px solid #f1f5f9; font-size: 0.75rem; color: #94a3b8; font-weight: 600; }
+    /* Modal Overlay */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 999; display: none; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+    .modal-overlay.open { display: flex; }
+    .modal-box { background: white; padding: 32px; border-radius: 16px; width: 450px; max-width: 90%; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
     
-    .dismiss-overlay{ position:absolute; inset:0; z-index:95; display:none; }
-    .dismiss-overlay.active{ display:block; }
-
-    /* --- Add Modal --- */
-    .modal-overlay {
-        position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-        background: rgba(0,0,0,0.5); z-index: 999; display: none;
-        align-items: center; justify-content: center; backdrop-filter: blur(2px);
-    }
-    .modal-overlay.active { display: flex; }
-    .modal-card { background: white; width: 400px; max-width: 90%; border-radius: 12px; padding: 25px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); }
-    .modal-card h2 { margin-top: 0; font-size: 1.25rem; color: #0f172a; }
-    .form-group { margin-bottom: 15px; }
-    .form-group label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 5px; color: #334155; }
-    .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-family: inherit; font-size: 0.9rem; box-sizing: border-box; }
-    .form-group textarea { height: 80px; resize: vertical; }
-    .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
-    .btn-cancel { background: white; border: 1px solid #cbd5e1; color: #64748b; padding: 8px 16px; border-radius: 6px; cursor: pointer; }
-    .btn-save { background: var(--primary); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; }
-
+    .form-row { margin-bottom: 16px; }
+    .form-row label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 8px; color: #334155; }
+    .form-row input, .form-row select, .form-row textarea { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-family: inherit; box-sizing: border-box; }
+    
   </style>
 </head>
 <body>
 
-  <div class="header-controls">
+  <aside class="sidebar">
+    <div class="brand-area">
+      <img src="./Untitled design (8).png" alt="HD Logo" class="brand-logo">
+      <div class="brand-text">HD Onboarding</div>
+    </div>
+
+    <div class="nav-menu">
+      <div class="nav-label">Main Views</div>
+      <div class="nav-item active" onclick="setPersona('new_leader', this)">
+        <span>👥</span> New Leader Track
+      </div>
+      <div class="nav-item" onclick="setPersona('promo_leader', this)">
+        <span>🚀</span> Internal Promotion
+      </div>
+      <div class="nav-item" onclick="setPersona('general', this)">
+        <span>👤</span> General Employee
+      </div>
+
+      <div class="nav-label" style="margin-top: 30px;">Resources</div>
+      <div class="nav-item" style="opacity: 0.6;"><span>📄</span> Templates Library</div>
+      <div class="nav-item" style="opacity: 0.6;"><span>⚙️</span> Process Settings</div>
+    </div>
+
+    <div class="user-profile">
+      <div class="avatar">HR</div>
+      <div class="user-info">
+        <div>HR Admin</div>
+        <div>admin@hd.com</div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main-content">
     
-    <div class="brand-container">
-        <img src="./Untitled design (8).png" alt="HD Logo" class="hd-logo">
+    <header class="top-bar">
+      <div class="page-title">
+        <h2>Process Overview <span id="view-label">/ New Leader</span></h2>
+      </div>
+      <div class="top-actions">
+        <button class="action-btn secondary" onclick="resetData()">Reset Data</button>
+        <button class="action-btn" onclick="openModal()">+ Add Step</button>
+      </div>
+    </header>
+
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-label">Total Steps</div>
+        <div class="stat-value" id="stat-total">0</div>
+        <div class="stat-indicator" style="background: var(--primary);"></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Key Milestones</div>
+        <div class="stat-value" id="stat-milestones">0</div>
+        <div class="stat-indicator" style="background: var(--leader);"></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Documents</div>
+        <div class="stat-value" id="stat-docs">0</div>
+        <div class="stat-indicator" style="background: var(--docs);"></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Est. Duration</div>
+        <div class="stat-value">90 Days</div>
+        <div class="stat-indicator" style="background: #94a3b8;"></div>
+      </div>
+    </div>
+
+    <div class="dashboard-view" id="scroller">
+      <div class="chart-surface">
         
-        <div class="title-block">
-            <h1>HD Onboarding Map</h1>
-            <p>Interactive Manager • <span id="item-count">0</span> Steps</p>
-        </div>
+        <div class="grid-body" id="main-grid">
+          </div>
+
+        <div class="checkpoints-sticky" id="check-bar">
+          <div class="check-label-box">
+            <div>Checkpoints</div>
+            <div style="font-size: 0.6rem; opacity: 0.7; margin-top: 4px;">LIVE TRACKER</div>
+          </div>
+          </div>
+
+        <svg id="svg-layer"></svg>
+      </div>
     </div>
 
-    <div class="center-controls">
-        <div class="legend">
-            <div class="legend-item"><div class="dot gen"></div> General</div>
-            <div class="legend-item"><div class="dot lead"></div> Leader</div>
-            <div class="legend-item"><div class="dot doc"></div> Docs</div>
-        </div>
-        <div class="btn-group">
-            <button onclick="setPersona('general')" id="btn-gen" class="filter-btn">General</button>
-            <button onclick="setPersona('new_leader')" id="btn-new" class="filter-btn active">New Leader</button>
-            <button onclick="setPersona('promo_leader')" id="btn-promo" class="filter-btn">Promoted</button>
-        </div>
-    </div>
-    <div style="display: flex; gap: 10px;">
-        <button class="action-btn reset-btn" onclick="resetData()">Reset</button>
-        <button class="action-btn" onclick="openAddModal()">+ Add Process</button>
-    </div>
-  </div>
-
-  <div class="diagram-wrapper" id="scroll-area">
-    <div class="dismiss-overlay" id="dismiss"></div>
-    
-    <div class="grid-container" id="main-grid"></div>
-    
-    <svg id="svg-layer"></svg>
-
-    <div class="checkpoints-bar" id="checkpoints-bar">
-        <div class="check-label-container">
-            <div>CHECKPOINTS</div>
-            <div style="font-size:0.6rem; color:#94a3b8; font-weight:500; margin-top:4px;">PROGRESS TRACKER</div>
-        </div>
-        </div>
-
-    <div class="popover" id="detail-popover">
+    <div class="popover" id="popover">
       <h4 id="pop-title">Title</h4>
-      <div class="popover-content" id="pop-desc">Description here.</div>
-      <div class="popover-meta" id="pop-owner">OWNER: HR</div>
+      <div class="popover-content" id="pop-desc"></div>
+      <div class="popover-meta" id="pop-meta" style="margin-top: 15px; font-size: 0.75rem; color: #94a3b8; border-top: 1px solid #f1f5f9; padding-top: 10px;"></div>
     </div>
-  </div>
+
+  </main>
 
   <div class="modal-overlay" id="add-modal">
-    <div class="modal-card">
-        <h2>Add New Process</h2>
-        <div class="form-group">
-            <label>Title</label> <input type="text" id="new-title" placeholder="e.g., Meet with VP">
-        </div>
-        <div class="form-group">
-            <label>Short Description</label> <input type="text" id="new-desc" placeholder="e.g., Strategic Alignment">
-        </div>
-        <div class="form-group">
-            <label>Time Phase</label>
-            <select id="new-phase">
-                <option value="0">Trigger / Pre-boarding</option>
-                <option value="1">Day 1</option>
-                <option value="2">Week 1</option>
-                <option value="3">Week 2</option>
-                <option value="4">30 Days</option>
-                <option value="5">45 Days</option>
-                <option value="6">60 Days</option>
-                <option value="7">90 Days</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label>Applies To (Role)</label>
-            <select id="new-role">
-                <option value="new_leader">Leader Only</option>
-                <option value="general">General Employee</option>
-                <option value="docs">Documentation (All)</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label>Full Context</label> <textarea id="new-context" placeholder="Enter concise bullet points..."></textarea>
-        </div>
-        <div class="modal-actions">
-            <button class="btn-cancel" onclick="closeAddModal()">Cancel</button>
-            <button class="btn-save" onclick="saveNewStep()">Save Process</button>
-        </div>
+    <div class="modal-box">
+      <h2 style="margin-top:0;">Add New Process Step</h2>
+      <div class="form-row">
+        <label>Title</label>
+        <input type="text" id="new-title" placeholder="Step Name">
+      </div>
+      <div class="form-row">
+        <label>Phase</label>
+        <select id="new-phase">
+          <option value="0">Trigger</option>
+          <option value="1">Day 1</option>
+          <option value="2">Week 1</option>
+          <option value="3">Week 2</option>
+          <option value="4">30 Days</option>
+          <option value="5">45 Days</option>
+          <option value="6">60 Days</option>
+          <option value="7">90 Days</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <label>Type</label>
+        <select id="new-type">
+          <option value="new_leader">Leader Only</option>
+          <option value="general">General Employee</option>
+          <option value="docs">Documentation</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <label>Details (Bullet points)</label>
+        <textarea id="new-context" rows="3" placeholder="- Detail 1&#10;- Detail 2"></textarea>
+      </div>
+      <div style="display:flex; justify-content:flex-end; gap:10px;">
+        <button class="action-btn secondary" onclick="closeModal()">Cancel</button>
+        <button class="action-btn" onclick="saveNewStep()">Save Step</button>
+      </div>
     </div>
   </div>
 
   <script>
     const phases = ["Trigger","Day 1","Week 1","Week 2","30 Days","45 Days","60 Days","90 Days"];
-    
-    // Default Data - Concise & Updated
     const defaultSteps = [
-      { id:'trig', title:"Offer Accepted", desc:"Process Trigger", phase:0, type:'general', roles:['all'], 
-        context:"<ul><li>Candidate accepts offer in the portal.</li><li>Integration triggers HRIS profile creation.</li><li>Notifications sent to HR and Hiring Manager.</li></ul>", connectTo:['doc_req','welc'] },
-      
-      { id:'doc_req', title:"Request Docs", desc:"Automated Checklist", phase:0, type:'docs', roles:['all'], 
-        context:"<ul><li>System automatically sends email checklist.</li><li><b>Required:</b> ID, Tax Forms, Bank Details, Address Proof.</li><li>Deadline: Before Day 1.</li></ul>", connectTo:['sign'] },
-      
-      { id:'welc', title:"General Welcome", desc:"Day 1 Logistics", phase:1, type:'general', roles:['all'], 
-        context:"<ul><li>Reception greeting & Badge issuance.</li><li>IT Hardware handoff (Laptop/Phone).</li><li>Desk setup and facility tour.</li></ul>", connectTo:['train'] },
-      
-      { id:'sign', title:"Sign Contract", desc:"Legal & Compliance", phase:1, type:'docs', roles:['all'], 
-        context:"<ul><li>Physical or digital signature of Employment Contract.</li><li>NDA and Code of Conduct signing.</li><li>Validated by Legal team.</li></ul>", connectTo:[] },
-      
-      { id:'comm_gen', title:"Entry Announcement", desc:"Team Email", phase:1, type:'general', roles:['general'], 
-        context:"<ul><li>Standard 'New Joiner' email sent to immediate department.</li><li>Includes: Bio, Role, and Photo.</li></ul>", connectTo:['train'] },
-      
-      { id:'comm_lead', title:"Entry Announcement", desc:"Org-wide Email", phase:1, type:'leader', roles:['new_leader'], 
-        context:"<ul><li>VP/HR sends welcome email to the wider organization.</li><li>Introduces new leader's background and strategic focus.</li></ul>", connectTo:['go_day'] },
-      
-      { id:'comm_promo', title:"Promotion Comms", desc:"Internal Announcement", phase:1, type:'leader', roles:['promo_leader'], 
-        context:"<ul><li>Official communication regarding internal promotion.</li><li>Sent to relevant departments or company-wide.</li></ul>", connectTo:['go_day'] },
-      
-      { id:'train', title:"Core Training", desc:"LMS Modules", phase:2, type:'general', roles:['all'], 
-        context:"<ul><li><b>Mandatory Modules:</b></li><li>Code of Conduct</li><li>Data Privacy & Security</li><li>Global Business Overview</li><li>Safety Procedures</li></ul>", connectTo:['intro'] },
-      
-      { id:'intro', title:"Team Intros", desc:"Meet & Greets", phase:3, type:'general', roles:['all'], 
-        context:"<ul><li>Scheduled 1:1s with direct reports.</li><li>Intro meetings with key cross-functional partners.</li><li>Lunch with the immediate team.</li></ul>", connectTo:[] },
-      
-      { id:'go_day', title:"Go Day Plan", desc:"30-Day Strategy", phase:4, type:'leader', roles:['new_leader','promo_leader'], 
-        context:"<ul><li><b>Leader Requirement:</b> Create a structured focus plan.</li><li>Identify key priorities and quick wins.</li><li><b>Deliverable:</b> Review draft with Manager by Day 30.</li></ul>", connectTo:['rev_60'] },
-      
-      { id:'rev_30', title:"30-Day Check", desc:"HR Touchpoint", phase:4, type:'general', roles:['general'], 
-        context:"<ul><li>Casual check-in with HR BP.</li><li>Confirm access to all tools.</li><li>Gauge early cultural integration.</li></ul>", connectTo:[] },
-      
-      { id:'rev_60', title:"60-Day Progress", desc:"Plan Review", phase:6, type:'leader', roles:['new_leader','promo_leader'], 
-        context:"<ul><li>Review execution of the Go Day Plan.</li><li>Assess progress on 'Quick Wins'.</li><li>Adjust MBOs if necessary.</li></ul>", connectTo:['final_90'] },
-      
-      { id:'final_90', title:"90-Day Deliverables", desc:"MBOs & SWOT", phase:7, type:'leader', roles:['new_leader','promo_leader'], 
-        context:"<ul><li><b>Final Submission Stack:</b></li><li>Full Action Plan (Long term)</li><li>Finalized MBOs</li><li>SWOT Analysis of function</li><li>Team Talent Diagnostic</li></ul>", connectTo:[] },
-      
-      { id:'probation', title:"Probation Review", desc:"Employment Confirm", phase:7, type:'general', roles:['general'], 
-        context:"<ul><li>Formal performance review.</li><li>Confirmation of permanent employment status.</li><li>Goal setting for the next 6 months.</li></ul>", connectTo:[] }
+      { id:'trig', title:"Offer Accepted", desc:"Process Trigger", phase:0, type:'general', roles:['all'], context:"<ul><li>Candidate accepts offer.</li><li>HRIS profile created.</li></ul>", connectTo:['doc_req','welc'] },
+      { id:'doc_req', title:"Request Docs", desc:"Automated Checklist", phase:0, type:'docs', roles:['all'], context:"<ul><li>ID, Tax Forms, Address Proof.</li><li>Deadline: Before Day 1.</li></ul>", connectTo:['sign'] },
+      { id:'welc', title:"General Welcome", desc:"Day 1 Logistics", phase:1, type:'general', roles:['all'], context:"<ul><li>Reception greeting.</li><li>Badge issuance.</li><li>IT Hardware handoff.</li></ul>", connectTo:['train'] },
+      { id:'sign', title:"Sign Contract", desc:"Legal & Compliance", phase:1, type:'docs', roles:['all'], context:"<ul><li>Sign Employment Contract.</li><li>NDA & Code of Conduct.</li></ul>", connectTo:[] },
+      { id:'comm_gen', title:"Entry Announcement", desc:"Team Email", phase:1, type:'general', roles:['general'], context:"<ul><li>'New Joiner' email to dept.</li><li>Includes Bio & Photo.</li></ul>", connectTo:['train'] },
+      { id:'comm_lead', title:"Entry Announcement", desc:"Org-wide Email", phase:1, type:'leader', roles:['new_leader'], context:"<ul><li>VP/HR sends welcome email.</li><li>Introduces strategy focus.</li></ul>", connectTo:['go_day'] },
+      { id:'comm_promo', title:"Promotion Comms", desc:"Internal", phase:1, type:'leader', roles:['promo_leader'], context:"<ul><li>Official promotion comms.</li><li>Sent company-wide.</li></ul>", connectTo:['go_day'] },
+      { id:'train', title:"Core Training", desc:"LMS Modules", phase:2, type:'general', roles:['all'], context:"<ul><li>Code of Conduct</li><li>Data Privacy</li><li>Safety Procedures</li></ul>", connectTo:['intro'] },
+      { id:'intro', title:"Team Intros", desc:"Meet & Greets", phase:3, type:'general', roles:['all'], context:"<ul><li>1:1s with direct reports.</li><li>Lunch with immediate team.</li></ul>", connectTo:[] },
+      { id:'go_day', title:"Go Day Plan", desc:"30-Day Strategy", phase:4, type:'leader', roles:['new_leader','promo_leader'], context:"<ul><li>Create structured focus plan.</li><li>Review draft with Manager.</li></ul>", connectTo:['rev_60'] },
+      { id:'rev_30', title:"30-Day Check", desc:"HR Touchpoint", phase:4, type:'general', roles:['general'], context:"<ul><li>Casual check-in.</li><li>Confirm tools access.</li></ul>", connectTo:[] },
+      { id:'rev_60', title:"60-Day Progress", desc:"Plan Review", phase:6, type:'leader', roles:['new_leader','promo_leader'], context:"<ul><li>Review Go Day Plan execution.</li><li>Adjust MBOs if needed.</li></ul>", connectTo:['final_90'] },
+      { id:'final_90', title:"90-Day Deliverables", desc:"MBOs & SWOT", phase:7, type:'leader', roles:['new_leader','promo_leader'], context:"<ul><li>Full Action Plan.</li><li>Finalized MBOs.</li><li>SWOT Analysis.</li></ul>", connectTo:[] },
+      { id:'probation', title:"Probation Review", desc:"Employment Confirm", phase:7, type:'general', roles:['general'], context:"<ul><li>Formal performance review.</li><li>Confirm permanent status.</li></ul>", connectTo:[] }
     ];
 
     let steps = [];
     let currentRole = 'new_leader';
 
     function init() {
-        const saved = localStorage.getItem('hd_onboarding_final');
-        steps = saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(defaultSteps));
-        setPersona('new_leader');
-
-        // Scroll listener for Lines
-        const mainArea = document.getElementById('scroll-area');
-        mainArea.addEventListener('scroll', () => { drawLines(); });
-        
-        document.getElementById('dismiss').addEventListener('click', hidePopover);
-        window.addEventListener('resize', () => {
-            clearTimeout(window.resizeTimer);
-            window.resizeTimer = setTimeout(() => drawLines(), 100);
-        });
+      const saved = localStorage.getItem('hd_dash_v1');
+      steps = saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(defaultSteps));
+      
+      setPersona('new_leader'); // Default view
+      
+      // Events
+      document.getElementById('scroller').addEventListener('scroll', drawLines);
+      window.addEventListener('resize', () => { setTimeout(drawLines, 100); });
+      document.addEventListener('click', (e) => {
+        // Close popover if clicking outside
+        if(!e.target.closest('.node-card')) hidePopover();
+      });
     }
 
-    // --- DATA ---
-    function saveData() { localStorage.setItem('hd_onboarding_final', JSON.stringify(steps)); document.getElementById('item-count').innerText = steps.length; }
-    function resetData() { if(confirm("Reset all data?")) { steps = JSON.parse(JSON.stringify(defaultSteps)); saveData(); render(); } }
-    
-    function saveNewStep() {
-        const title = document.getElementById('new-title').value;
-        const phase = parseInt(document.getElementById('new-phase').value);
-        const roleType = document.getElementById('new-role').value;
-        if(!title) { alert("Title required"); return; }
+    // --- LOGIC ---
+    function setPersona(role, btnElement) {
+      currentRole = role;
+      
+      // Sidebar Active State
+      if(btnElement) {
+        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+        btnElement.classList.add('active');
+      }
 
-        let rolesArr = roleType === 'new_leader' ? ['new_leader', 'promo_leader'] : (roleType === 'general' ? ['general', 'all'] : ['all']);
-        let typeClass = roleType === 'new_leader' ? 'leader' : (roleType === 'general' ? 'general' : 'docs');
-        let rawContext = document.getElementById('new-context').value || "Custom process.";
-        
-        // Auto-format bullets if user didn't use HTML
-        if(!rawContext.includes('<ul>')) {
-            rawContext = '<ul><li>' + rawContext.replace(/\n/g, '</li><li>') + '</li></ul>';
-        }
+      // Update Header Label
+      const labels = { 'new_leader': '/ New Leader', 'promo_leader': '/ Internal Promotion', 'general': '/ General Employee' };
+      document.getElementById('view-label').innerText = labels[role];
 
-        steps.push({
-            id: 'custom_' + Date.now(), title: title, desc: document.getElementById('new-desc').value,
-            phase: phase, type: typeClass, roles: rolesArr,
-            context: rawContext,
-            connectTo: [], isCustom: true
-        });
-        saveData(); closeAddModal(); render();
-    }
-    function deleteStep(id) { if(confirm("Delete step?")) { steps = steps.filter(s => s.id !== id); saveData(); render(); } }
-
-    // --- UI ---
-    function openAddModal() { document.getElementById('add-modal').classList.add('active'); }
-    function closeAddModal() { document.getElementById('add-modal').classList.remove('active'); }
-
-    function setPersona(role) {
-        currentRole = role;
-        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-        if(role === 'general') document.getElementById('btn-gen').classList.add('active');
-        if(role === 'new_leader') document.getElementById('btn-new').classList.add('active');
-        if(role === 'promo_leader') document.getElementById('btn-promo').classList.add('active');
-        hidePopover(); 
-        resetProgress(); // Reset bottom bar
-        render();
+      render();
     }
 
     function render() {
-        const grid = document.getElementById('main-grid');
-        const checkBar = document.getElementById('checkpoints-bar');
+      const grid = document.getElementById('main-grid');
+      const checkBar = document.getElementById('check-bar');
+      
+      // Reset
+      grid.innerHTML = '';
+      while (checkBar.children.length > 1) { checkBar.removeChild(checkBar.lastChild); }
+
+      // Filter Data
+      const visibleSteps = steps.filter(s => s.roles.includes('all') || s.roles.includes(currentRole));
+      
+      // Update Stats
+      document.getElementById('stat-total').innerText = visibleSteps.length;
+      document.getElementById('stat-docs').innerText = visibleSteps.filter(s => s.type === 'docs').length;
+      document.getElementById('stat-milestones').innerText = visibleSteps.filter(s => s.type === 'leader').length;
+
+      const colElements = [];
+      
+      // Build Columns
+      phases.forEach((phase, idx) => {
+        // Main Grid Column
+        const col = document.createElement('div');
+        col.className = 'time-column';
+        col.innerHTML = `<div class="col-header">${phase}</div>`;
+        grid.appendChild(col);
+        colElements.push(col);
+
+        // Checkpoint Column
+        const checkCol = document.createElement('div');
+        checkCol.className = 'check-col';
+        checkCol.id = `check-${idx}`;
+        checkCol.innerHTML = `
+          <div class="progress-bar"></div>
+          <div class="progress-fill"></div>
+          <div class="check-dot"></div>
+          <div style="font-size:0.65rem; color:#94a3b8; margin-top:4px;">${idx===0?'Start':'Check'}</div>
+        `;
+        checkBar.appendChild(checkCol);
+      });
+
+      // Place Cards
+      visibleSteps.forEach(step => {
+        const card = document.createElement('div');
+        card.className = `node-card ${step.type}`;
+        card.id = `card-${step.id}`;
+        card.innerHTML = `<div class="node-title">${step.title}</div><div class="node-meta">${step.desc}</div>`;
         
-        grid.innerHTML = '';
-        // Remove old columns from checkpoint bar, keep label
-        while (checkBar.children.length > 1) { checkBar.removeChild(checkBar.lastChild); }
-        document.getElementById('item-count').innerText = steps.length;
+        card.onclick = (e) => {
+          e.stopPropagation();
+          showPopover(step, card);
+          updateProgress(step.phase);
+        };
 
-        const colElements = [];
-        const checkElements = [];
+        if(colElements[step.phase]) colElements[step.phase].appendChild(card);
+      });
 
-        phases.forEach((phaseName, idx) => {
-            // Main Grid Column
-            const col = document.createElement('div');
-            col.className = 'time-column';
-            col.innerHTML = `<div class="col-header">${phaseName}</div>`;
-            grid.appendChild(col);
-            colElements.push(col);
-
-            // Checkpoint Column (Sticky)
-            const checkCol = document.createElement('div');
-            checkCol.className = 'check-col';
-            checkCol.id = `check-col-${idx}`;
-            checkCol.innerHTML = `
-                <div class="progress-line-bg"></div>
-                <div class="progress-line-fill"></div>
-                <div class="check-dot"></div>
-                <div>${idx === 0 ? 'Start' : 'Check'}</div>
-            `;
-            checkBar.appendChild(checkCol);
-            checkElements.push(checkCol);
-        });
-
-        const visibleSteps = steps.filter(s => s.roles.includes('all') || s.roles.includes(currentRole));
-
-        visibleSteps.forEach(step => {
-            const card = document.createElement('div');
-            card.className = `node-card ${step.type}`;
-            card.id = `card-${step.id}`;
-            let html = `<div class="node-title">${step.title}</div><div class="node-meta">${step.desc}</div>${step.type === 'leader' ? '<span class="stack-badge">Leader Task</span>' : ''}`;
-            if(step.isCustom) html += `<button class="delete-step-btn" onclick="deleteStep('${step.id}'); event.stopPropagation();">×</button>`;
-            card.innerHTML = html;
-            
-            card.onclick = (e) => { 
-                e.stopPropagation(); 
-                showPopover(step, card);
-                updateProgress(step.phase); // Highlight bottom bar
-            };
-            
-            if(colElements[step.phase]) colElements[step.phase].appendChild(card);
-        });
-
-        setTimeout(() => drawLines(visibleSteps), 50);
+      setTimeout(() => drawLines(visibleSteps), 50);
     }
 
-    // --- PROGRESS LOGIC ---
-    function updateProgress(activePhaseIdx) {
-        document.querySelectorAll('.node-card').forEach(c => c.classList.remove('active-card'));
-        
-        for(let i=0; i<8; i++) {
-            const col = document.getElementById(`check-col-${i}`);
-            if(i <= activePhaseIdx) {
-                col.classList.add('filled');
-            } else {
-                col.classList.remove('filled');
-            }
-        }
-    }
-    
-    function resetProgress() {
-        for(let i=0; i<8; i++) {
-            document.getElementById(`check-col-${i}`)?.classList.remove('filled');
-        }
+    // --- FEATURES ---
+    function updateProgress(phaseIdx) {
+      for(let i=0; i<8; i++) {
+        const el = document.getElementById(`check-${i}`);
+        if(i <= phaseIdx) el.classList.add('active');
+        else el.classList.remove('active');
+      }
     }
 
-    // --- POPOVER ---
-    function showPopover(data, cardEl) {
-        const pop = document.getElementById('detail-popover');
-        const wrapper = document.getElementById('scroll-area');
-        const cardRect = cardEl.getBoundingClientRect();
-        const wrapperRect = wrapper.getBoundingClientRect();
+    function showPopover(data, el) {
+      const pop = document.getElementById('popover');
+      const rect = el.getBoundingClientRect();
+      const wrapRect = document.getElementById('scroller').getBoundingClientRect();
+      
+      document.getElementById('pop-title').innerText = data.title;
+      document.getElementById('pop-desc').innerHTML = data.context;
+      document.getElementById('pop-meta').innerText = "OWNER: " + data.type.toUpperCase();
 
-        // Add visual highlight to card
-        cardEl.classList.add('active-card');
+      // Position logic
+      let left = (rect.right - wrapRect.left) + 20;
+      let top = (rect.top - wrapRect.top);
+      
+      // Flip if too far right
+      if(left + 300 > wrapRect.width) {
+        left = (rect.left - wrapRect.left) - 320;
+      }
 
-        document.getElementById('pop-title').innerText = data.title;
-        document.getElementById('pop-desc').innerHTML = data.context;
-        document.getElementById('pop-owner').innerText = "OWNER: " + data.type.toUpperCase();
-
-        let leftPos = (cardRect.right - wrapperRect.left) + wrapper.scrollLeft + 20; 
-        let topPos = (cardRect.top - wrapperRect.top) + wrapper.scrollTop - 10;
-        
-        if((cardRect.right + 300) > wrapper.clientWidth) {
-            leftPos = (cardRect.left - wrapperRect.left) + wrapper.scrollLeft - 300;
-            pop.classList.add('flip-left');
-        } else { pop.classList.remove('flip-left'); }
-
-        pop.style.top = topPos + 'px'; pop.style.left = leftPos + 'px';
-        pop.classList.add('active'); document.getElementById('dismiss').classList.add('active');
-    }
-    
-    function hidePopover() { 
-        document.getElementById('detail-popover').classList.remove('active'); 
-        document.getElementById('dismiss').classList.remove('active');
-        document.querySelectorAll('.node-card').forEach(c => c.classList.remove('active-card'));
+      pop.style.left = left + 'px';
+      pop.style.top = top + 'px';
+      pop.classList.add('visible');
     }
 
-    // --- LINES ---
+    function hidePopover() { document.getElementById('popover').classList.remove('visible'); }
+
     function drawLines(visibleSteps) {
-        const svg = document.getElementById('svg-layer');
-        const grid = document.getElementById('main-grid');
-        svg.style.width = grid.scrollWidth + 'px';
-        svg.style.height = grid.scrollHeight + 'px';
-        
-        svg.innerHTML = `<defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L0,6 L9,3 z" fill="#94a3b8" /></marker></defs>`;
-        
-        if(!visibleSteps) visibleSteps = steps.filter(s => s.roles.includes('all') || s.roles.includes(currentRole));
-        visibleSteps.forEach(source => {
-            if(!source.connectTo) return;
-            source.connectTo.forEach(targetId => {
-                if(!visibleSteps.find(s => s.id === targetId)) return;
-                const startEl = document.getElementById(`card-${source.id}`);
-                const endEl = document.getElementById(`card-${targetId}`);
-                if(startEl && endEl) drawPolyline(svg, startEl, endEl);
-            });
+      // (Same drawing logic as V7, adapted for new container)
+      const svg = document.getElementById('svg-layer');
+      const grid = document.getElementById('main-grid');
+      const scroll = document.getElementById('scroller');
+      
+      svg.style.width = grid.scrollWidth + 'px';
+      svg.style.height = grid.scrollHeight + 'px';
+      
+      let paths = '';
+      
+      // Re-filter if needed
+      if(!visibleSteps) visibleSteps = steps.filter(s => s.roles.includes('all') || s.roles.includes(currentRole));
+
+      visibleSteps.forEach(src => {
+        if(!src.connectTo) return;
+        src.connectTo.forEach(targetId => {
+          // Find target in visible set
+          if(!visibleSteps.find(s => s.id === targetId)) return;
+          
+          const el1 = document.getElementById(`card-${src.id}`);
+          const el2 = document.getElementById(`card-${targetId}`);
+          
+          if(el1 && el2) {
+            const r1 = el1.getBoundingClientRect();
+            const r2 = el2.getBoundingClientRect();
+            const cRect = grid.getBoundingClientRect(); // Canvas rect
+
+            // Coords relative to Grid
+            const x1 = r1.right - cRect.left;
+            const y1 = (r1.top + r1.height/2) - cRect.top;
+            const x2 = r2.left - cRect.left;
+            const y2 = (r2.top + r2.height/2) - cRect.top;
+            
+            const mid = x1 + (x2-x1)/2;
+            paths += `<path d="M ${x1} ${y1} L ${mid} ${y1} L ${mid} ${y2} L ${x2} ${y2}" fill="none" stroke="#cbd5e1" stroke-width="2" marker-end="url(#arrow)" />`;
+          }
         });
+      });
+
+      svg.innerHTML = `<defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L0,6 L9,3 z" fill="#94a3b8"/></marker></defs>${paths}`;
     }
 
-    function drawPolyline(svg, startEl, endEl) {
-        const svgRect = svg.getBoundingClientRect(); 
-        const sRect = startEl.getBoundingClientRect();
-        const eRect = endEl.getBoundingClientRect();
+    // --- MODAL & DATA ---
+    function openModal() { document.getElementById('add-modal').classList.add('open'); }
+    function closeModal() { document.getElementById('add-modal').classList.remove('open'); }
+    
+    function saveNewStep() {
+      const title = document.getElementById('new-title').value;
+      if(!title) return;
+      
+      const roleKey = document.getElementById('new-type').value;
+      const roles = roleKey === 'new_leader' ? ['new_leader','promo_leader'] : (roleKey === 'general' ? ['general','all'] : ['all']);
+      const type = roleKey === 'new_leader' ? 'leader' : (roleKey === 'general' ? 'general' : 'docs');
+      
+      let ctx = document.getElementById('new-context').value || "";
+      if(!ctx.includes('<ul>')) ctx = `<ul><li>${ctx.replace(/\n/g, '</li><li>')}</li></ul>`;
 
-        const x1 = (sRect.right - svgRect.left);
-        const y1 = (sRect.top + sRect.height/2 - svgRect.top);
-        const x2 = (eRect.left - svgRect.left);
-        const y2 = (eRect.top + eRect.height/2 - svgRect.top);
-        const midX = x1 + (x2 - x1) / 2;
-        
-        const polyline = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
-        polyline.setAttribute("points", `${x1},${y1} ${midX},${y1} ${midX},${y2} ${x2},${y2}`);
-        polyline.setAttribute("fill", "none"); polyline.setAttribute("stroke", "#cbd5e1");
-        polyline.setAttribute("stroke-width", "2"); polyline.setAttribute("marker-end", "url(#arrow)");
-        svg.appendChild(polyline);
+      steps.push({
+        id: 'cust_'+Date.now(),
+        title: title,
+        desc: "Custom Step",
+        phase: parseInt(document.getElementById('new-phase').value),
+        type: type,
+        roles: roles,
+        context: ctx,
+        connectTo: [],
+        isCustom: true
+      });
+      
+      localStorage.setItem('hd_dash_v1', JSON.stringify(steps));
+      closeModal();
+      render();
+    }
+
+    function resetData() {
+      if(confirm("Reset all data?")) {
+        steps = JSON.parse(JSON.stringify(defaultSteps));
+        localStorage.setItem('hd_dash_v1', JSON.stringify(steps));
+        render();
+      }
     }
 
     init();
