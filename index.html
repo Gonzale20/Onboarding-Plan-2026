@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HD Onboarding - Edge Optimized</title>
+  <title>HD Onboarding - Fixed & Interactive</title>
   <style>
     :root {
       --primary: #2563eb;
@@ -80,10 +80,9 @@
     /* --- Main Scrollable Area --- */
     .diagram-wrapper {
       flex: 1;
-      overflow: auto; /* Allows both X and Y scroll */
+      overflow: auto; /* X and Y scroll handled here */
       position: relative;
       background: var(--bg);
-      /* This ensures the sticky elements work relative to this container */
       scroll-behavior: smooth;
     }
 
@@ -91,8 +90,7 @@
     .grid-container {
       display: flex;
       min-width: 1600px; /* Force horizontal scroll */
-      /* Ensure height fills at least the viewport so footer sticks correctly */
-      min-height: calc(100% - 70px); 
+      min-height: calc(100% - 80px); /* Leave room for footer */
       position: relative;
     }
 
@@ -127,6 +125,7 @@
     .node-card.leader { border-left: 4px solid var(--leader-color); }
     .node-card.general { border-left: 4px solid var(--gen-color); }
     .node-card.docs { border-left: 4px solid var(--doc-color); }
+    .node-card.active-card { ring: 2px solid var(--primary); box-shadow: 0 0 0 4px rgba(37,99,235,0.1); }
 
     .node-title { font-weight: 700; font-size: 0.9rem; margin-bottom: 5px; }
     .node-meta { font-size: 0.75rem; color: var(--secondary); line-height: 1.4; }
@@ -143,55 +142,72 @@
     /* --- SVG Layer --- */
     #svg-layer { position: absolute; top: 0; left: 0; pointer-events: none; z-index: 8; }
 
-    /* --- Checkpoints Footer (REFACTORED FOR EDGE) --- */
-    /* This is now INSIDE the scroll wrapper, not fixed to screen */
+    /* --- Checkpoints Footer (Sticky Fix) --- */
     .checkpoints-bar {
-      position: sticky; /* Magic fix: Sticks to bottom of diagram-wrapper */
+      position: sticky; /* Fixes Edge scrolling issue */
       bottom: 0;
       left: 0;
-      min-width: 1600px; /* Match grid width */
-      height: 70px;
+      min-width: 1600px; /* Must match grid width */
+      height: 80px;
       display: flex;
-      background: white; /* Solid background prevents "erased" look */
-      border-top: 2px solid var(--primary);
-      z-index: 100; /* Above cards */
-      box-shadow: 0 -4px 10px rgba(0,0,0,0.03);
+      background: #ffffff; /* Solid white (No blur to fix "erased" look) */
+      border-top: 2px solid #e2e8f0;
+      z-index: 100;
+      box-shadow: 0 -4px 12px rgba(0,0,0,0.05);
     }
 
-    /* The "CHECKPOINTS" Label */
     .check-label-container {
-        position: sticky; /* Magic fix: Sticks to left of screen when scrolling right */
+        position: sticky; /* Keeps label visible while scrolling right */
         left: 0;
-        width: 150px;
-        background: white; /* Covers the dots passing under */
+        width: 140px;
+        background: white;
         display: flex;
-        align-items: center;
-        padding-left: 30px;
+        flex-direction: column;
+        justify-content: center;
+        padding-left: 24px;
         font-weight: 800;
         color: var(--primary);
         text-transform: uppercase;
-        font-size: 0.8rem;
-        z-index: 102; /* Topmost */
-        border-right: 2px solid #f1f5f9;
-        box-shadow: 4px 0 10px rgba(255,255,255,1); /* Fade effect */
+        font-size: 0.75rem;
+        z-index: 102;
+        border-right: 1px solid #f1f5f9;
+        box-shadow: 4px 0 10px rgba(255,255,255,1);
     }
 
     .check-col {
-      flex: 1; /* Auto-matches columns above */
-      display: flex; flex-direction: column;
+      flex: 1; display: flex; flex-direction: column;
       justify-content: center; align-items: center;
       font-size: 0.75rem; color: var(--secondary);
-      border-right: 1px dashed var(--border);
-      background: #f8fafc;
+      border-right: 1px dashed #f1f5f9;
       position: relative;
     }
 
-    .check-dot {
-      width: 12px; height: 12px;
-      background: var(--gen-color); border-radius: 50%;
-      margin-bottom: 5px;
-      box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+    /* Progress Line Background */
+    .progress-line-bg {
+        position: absolute; top: 28px; left: 0; width: 100%; height: 2px;
+        background: #e2e8f0; z-index: 1;
     }
+    /* Progress Line Fill */
+    .progress-line-fill {
+        position: absolute; top: 28px; left: 0; width: 0%; height: 2px;
+        background: var(--primary); z-index: 2; transition: width 0.4s ease;
+    }
+    /* Active modifier for fill */
+    .check-col.filled .progress-line-fill { width: 100%; }
+
+    .check-dot {
+      width: 14px; height: 14px;
+      background: white; border: 2px solid #cbd5e1; border-radius: 50%;
+      margin-bottom: 8px; z-index: 3; transition: all 0.3s;
+      position: relative;
+    }
+
+    /* Active State for Dot */
+    .check-col.filled .check-dot {
+        background: var(--primary); border-color: var(--primary);
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.2);
+    }
+    .check-col.filled { color: var(--primary); font-weight: 600; }
 
     /* --- Popover --- */
     .popover {
@@ -209,7 +225,12 @@
     }
     .popover.flip-left::after { left: auto; right: -8px; border-left: none; border-bottom: none; border-top: 1px solid var(--border); border-right: 1px solid var(--border); }
     .popover h4 { margin: 0 0 10px 0; color: var(--primary); font-size: 1rem; }
-    .popover-content { font-size: 0.85rem; color: #334155; line-height: 1.5; max-height: 200px; overflow-y: auto; }
+    
+    .popover-content { font-size: 0.85rem; color: #334155; line-height: 1.6; max-height: 250px; overflow-y: auto; }
+    /* Concise Bullet Styling */
+    .popover-content ul { margin: 0; padding-left: 20px; }
+    .popover-content li { margin-bottom: 6px; }
+
     .popover-meta { margin-top: 15px; padding-top: 10px; border-top: 1px solid #f1f5f9; font-size: 0.75rem; color: #94a3b8; font-weight: 600; }
     
     .dismiss-overlay{ position:absolute; inset:0; z-index:95; display:none; }
@@ -267,7 +288,10 @@
     <svg id="svg-layer"></svg>
 
     <div class="checkpoints-bar" id="checkpoints-bar">
-        <div class="check-label-container">CHECKPOINTS</div>
+        <div class="check-label-container">
+            <div>CHECKPOINTS</div>
+            <div style="font-size:0.6rem; color:#94a3b8; font-weight:500; margin-top:4px;">PROGRESS TRACKER</div>
+        </div>
         </div>
 
     <div class="popover" id="detail-popover">
@@ -308,7 +332,7 @@
             </select>
         </div>
         <div class="form-group">
-            <label>Full Context</label> <textarea id="new-context" placeholder="Enter detailed instructions..."></textarea>
+            <label>Full Context</label> <textarea id="new-context" placeholder="Enter concise bullet points..."></textarea>
         </div>
         <div class="modal-actions">
             <button class="btn-cancel" onclick="closeAddModal()">Cancel</button>
@@ -320,37 +344,63 @@
   <script>
     const phases = ["Trigger","Day 1","Week 1","Week 2","30 Days","45 Days","60 Days","90 Days"];
     
-    // Default Data
+    // Default Data - Concise & Updated
     const defaultSteps = [
-      { id:'trig', title:"Offer Accepted", desc:"Process Trigger", phase:0, type:'general', roles:['all'], context:"Candidate accepts offer. HRIS profile created.", connectTo:['doc_req','welc'] },
-      { id:'doc_req', title:"Request Docs", desc:"Automated Checklist", phase:0, type:'docs', roles:['all'], context:"System sends email requesting ID, tax forms.", connectTo:['sign'] },
-      { id:'welc', title:"General Welcome", desc:"Day 1 Logistics", phase:1, type:'general', roles:['all'], context:"Reception greeting. Badge issuance. IT Handoff.", connectTo:['train'] },
-      { id:'sign', title:"Sign Contract", desc:"Legal & Compliance", phase:1, type:'docs', roles:['all'], context:"Physical or digital signature of employment contract.", connectTo:[] },
-      { id:'comm_gen', title:"Entry Announcement", desc:"Team Email", phase:1, type:'general', roles:['general'], context:"'New Joiner' email sent to department.", connectTo:['train'] },
-      { id:'comm_lead', title:"Entry Announcement", desc:"Org-wide Email", phase:1, type:'leader', roles:['new_leader'], context:"VP/HR sends welcome email to organization.", connectTo:['go_day'] },
-      { id:'comm_promo', title:"Promotion Comms", desc:"Internal Announcement", phase:1, type:'leader', roles:['promo_leader'], context:"Official communication regarding promotion.", connectTo:['go_day'] },
-      { id:'train', title:"Core Training", desc:"LMS Modules", phase:2, type:'general', roles:['all'], context:"Mandatory: Code of Conduct, Data Privacy.", connectTo:['intro'] },
-      { id:'intro', title:"Team Intros", desc:"Meet & Greets", phase:3, type:'general', roles:['all'], context:"Scheduled 1:1s with direct reports.", connectTo:[] },
-      { id:'go_day', title:"Go Day Plan", desc:"30-Day Strategy", phase:4, type:'leader', roles:['new_leader','promo_leader'], context:"<b>Leader Requirement:</b> Create structured plan. Review with Manager.", connectTo:['rev_60'] },
-      { id:'rev_30', title:"30-Day Check", desc:"HR Touchpoint", phase:4, type:'general', roles:['general'], context:"Casual check-in: confirm tools access.", connectTo:[] },
-      { id:'rev_60', title:"60-Day Progress", desc:"Plan Review", phase:6, type:'leader', roles:['new_leader','promo_leader'], context:"Review execution of Go Day Plan.", connectTo:['final_90'] },
-      { id:'final_90', title:"90-Day Deliverables", desc:"MBOs & SWOT", phase:7, type:'leader', roles:['new_leader','promo_leader'], context:"<b>Submission:</b> Full Action Plan, MBOs, SWOT.", connectTo:[] },
-      { id:'probation', title:"Probation Review", desc:"Employment Confirm", phase:7, type:'general', roles:['general'], context:"Formal performance review.", connectTo:[] }
+      { id:'trig', title:"Offer Accepted", desc:"Process Trigger", phase:0, type:'general', roles:['all'], 
+        context:"<ul><li>Candidate accepts offer in the portal.</li><li>Integration triggers HRIS profile creation.</li><li>Notifications sent to HR and Hiring Manager.</li></ul>", connectTo:['doc_req','welc'] },
+      
+      { id:'doc_req', title:"Request Docs", desc:"Automated Checklist", phase:0, type:'docs', roles:['all'], 
+        context:"<ul><li>System automatically sends email checklist.</li><li><b>Required:</b> ID, Tax Forms, Bank Details, Address Proof.</li><li>Deadline: Before Day 1.</li></ul>", connectTo:['sign'] },
+      
+      { id:'welc', title:"General Welcome", desc:"Day 1 Logistics", phase:1, type:'general', roles:['all'], 
+        context:"<ul><li>Reception greeting & Badge issuance.</li><li>IT Hardware handoff (Laptop/Phone).</li><li>Desk setup and facility tour.</li></ul>", connectTo:['train'] },
+      
+      { id:'sign', title:"Sign Contract", desc:"Legal & Compliance", phase:1, type:'docs', roles:['all'], 
+        context:"<ul><li>Physical or digital signature of Employment Contract.</li><li>NDA and Code of Conduct signing.</li><li>Validated by Legal team.</li></ul>", connectTo:[] },
+      
+      { id:'comm_gen', title:"Entry Announcement", desc:"Team Email", phase:1, type:'general', roles:['general'], 
+        context:"<ul><li>Standard 'New Joiner' email sent to immediate department.</li><li>Includes: Bio, Role, and Photo.</li></ul>", connectTo:['train'] },
+      
+      { id:'comm_lead', title:"Entry Announcement", desc:"Org-wide Email", phase:1, type:'leader', roles:['new_leader'], 
+        context:"<ul><li>VP/HR sends welcome email to the wider organization.</li><li>Introduces new leader's background and strategic focus.</li></ul>", connectTo:['go_day'] },
+      
+      { id:'comm_promo', title:"Promotion Comms", desc:"Internal Announcement", phase:1, type:'leader', roles:['promo_leader'], 
+        context:"<ul><li>Official communication regarding internal promotion.</li><li>Sent to relevant departments or company-wide.</li></ul>", connectTo:['go_day'] },
+      
+      { id:'train', title:"Core Training", desc:"LMS Modules", phase:2, type:'general', roles:['all'], 
+        context:"<ul><li><b>Mandatory Modules:</b></li><li>Code of Conduct</li><li>Data Privacy & Security</li><li>Global Business Overview</li><li>Safety Procedures</li></ul>", connectTo:['intro'] },
+      
+      { id:'intro', title:"Team Intros", desc:"Meet & Greets", phase:3, type:'general', roles:['all'], 
+        context:"<ul><li>Scheduled 1:1s with direct reports.</li><li>Intro meetings with key cross-functional partners.</li><li>Lunch with the immediate team.</li></ul>", connectTo:[] },
+      
+      { id:'go_day', title:"Go Day Plan", desc:"30-Day Strategy", phase:4, type:'leader', roles:['new_leader','promo_leader'], 
+        context:"<ul><li><b>Leader Requirement:</b> Create a structured focus plan.</li><li>Identify key priorities and quick wins.</li><li><b>Deliverable:</b> Review draft with Manager by Day 30.</li></ul>", connectTo:['rev_60'] },
+      
+      { id:'rev_30', title:"30-Day Check", desc:"HR Touchpoint", phase:4, type:'general', roles:['general'], 
+        context:"<ul><li>Casual check-in with HR BP.</li><li>Confirm access to all tools.</li><li>Gauge early cultural integration.</li></ul>", connectTo:[] },
+      
+      { id:'rev_60', title:"60-Day Progress", desc:"Plan Review", phase:6, type:'leader', roles:['new_leader','promo_leader'], 
+        context:"<ul><li>Review execution of the Go Day Plan.</li><li>Assess progress on 'Quick Wins'.</li><li>Adjust MBOs if necessary.</li></ul>", connectTo:['final_90'] },
+      
+      { id:'final_90', title:"90-Day Deliverables", desc:"MBOs & SWOT", phase:7, type:'leader', roles:['new_leader','promo_leader'], 
+        context:"<ul><li><b>Final Submission Stack:</b></li><li>Full Action Plan (Long term)</li><li>Finalized MBOs</li><li>SWOT Analysis of function</li><li>Team Talent Diagnostic</li></ul>", connectTo:[] },
+      
+      { id:'probation', title:"Probation Review", desc:"Employment Confirm", phase:7, type:'general', roles:['general'], 
+        context:"<ul><li>Formal performance review.</li><li>Confirmation of permanent employment status.</li><li>Goal setting for the next 6 months.</li></ul>", connectTo:[] }
     ];
 
     let steps = [];
     let currentRole = 'new_leader';
 
     function init() {
-        const saved = localStorage.getItem('hd_onboarding_v6');
+        const saved = localStorage.getItem('hd_onboarding_v7');
         steps = saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(defaultSteps));
         setPersona('new_leader');
 
-        // Scroll listener ONLY for Line redrawing (Checkpoint bar handles itself via CSS Sticky)
+        // Scroll listener for Lines
         const mainArea = document.getElementById('scroll-area');
-        mainArea.addEventListener('scroll', () => {
-            drawLines();
-        });
+        mainArea.addEventListener('scroll', () => { drawLines(); });
+        
         document.getElementById('dismiss').addEventListener('click', hidePopover);
         window.addEventListener('resize', () => {
             clearTimeout(window.resizeTimer);
@@ -359,13 +409,9 @@
     }
 
     // --- DATA ---
-    function saveData() {
-        localStorage.setItem('hd_onboarding_v6', JSON.stringify(steps));
-        document.getElementById('item-count').innerText = steps.length;
-    }
-    function resetData() {
-        if(confirm("Reset all data?")) { steps = JSON.parse(JSON.stringify(defaultSteps)); saveData(); render(); }
-    }
+    function saveData() { localStorage.setItem('hd_onboarding_v7', JSON.stringify(steps)); document.getElementById('item-count').innerText = steps.length; }
+    function resetData() { if(confirm("Reset all data?")) { steps = JSON.parse(JSON.stringify(defaultSteps)); saveData(); render(); } }
+    
     function saveNewStep() {
         const title = document.getElementById('new-title').value;
         const phase = parseInt(document.getElementById('new-phase').value);
@@ -374,18 +420,22 @@
 
         let rolesArr = roleType === 'new_leader' ? ['new_leader', 'promo_leader'] : (roleType === 'general' ? ['general', 'all'] : ['all']);
         let typeClass = roleType === 'new_leader' ? 'leader' : (roleType === 'general' ? 'general' : 'docs');
+        let rawContext = document.getElementById('new-context').value || "Custom process.";
+        
+        // Auto-format bullets if user didn't use HTML
+        if(!rawContext.includes('<ul>')) {
+            rawContext = '<ul><li>' + rawContext.replace(/\n/g, '</li><li>') + '</li></ul>';
+        }
 
         steps.push({
             id: 'custom_' + Date.now(), title: title, desc: document.getElementById('new-desc').value,
             phase: phase, type: typeClass, roles: rolesArr,
-            context: document.getElementById('new-context').value || "Custom process.",
+            context: rawContext,
             connectTo: [], isCustom: true
         });
         saveData(); closeAddModal(); render();
     }
-    function deleteStep(id) {
-        if(confirm("Delete step?")) { steps = steps.filter(s => s.id !== id); saveData(); render(); }
-    }
+    function deleteStep(id) { if(confirm("Delete step?")) { steps = steps.filter(s => s.id !== id); saveData(); render(); } }
 
     // --- UI ---
     function openAddModal() { document.getElementById('add-modal').classList.add('active'); }
@@ -397,21 +447,23 @@
         if(role === 'general') document.getElementById('btn-gen').classList.add('active');
         if(role === 'new_leader') document.getElementById('btn-new').classList.add('active');
         if(role === 'promo_leader') document.getElementById('btn-promo').classList.add('active');
-        hidePopover(); render();
+        hidePopover(); 
+        resetProgress(); // Reset bottom bar
+        render();
     }
 
     function render() {
         const grid = document.getElementById('main-grid');
         const checkBar = document.getElementById('checkpoints-bar');
         
-        // Clear grid but KEEP the label in the checkpoint bar
         grid.innerHTML = '';
-        // Remove old columns from checkpoint bar (keep first child: label)
+        // Remove old columns from checkpoint bar, keep label
         while (checkBar.children.length > 1) { checkBar.removeChild(checkBar.lastChild); }
-        
         document.getElementById('item-count').innerText = steps.length;
 
         const colElements = [];
+        const checkElements = [];
+
         phases.forEach((phaseName, idx) => {
             // Main Grid Column
             const col = document.createElement('div');
@@ -420,11 +472,18 @@
             grid.appendChild(col);
             colElements.push(col);
 
-            // Checkpoint Column (Appended to Sticky Bar)
+            // Checkpoint Column (Sticky)
             const checkCol = document.createElement('div');
             checkCol.className = 'check-col';
-            checkCol.innerHTML = `<div class="check-dot"></div><div>${idx === 0 ? 'Trigger' : 'Check'}</div>`;
+            checkCol.id = `check-col-${idx}`;
+            checkCol.innerHTML = `
+                <div class="progress-line-bg"></div>
+                <div class="progress-line-fill"></div>
+                <div class="check-dot"></div>
+                <div>${idx === 0 ? 'Start' : 'Check'}</div>
+            `;
             checkBar.appendChild(checkCol);
+            checkElements.push(checkCol);
         });
 
         const visibleSteps = steps.filter(s => s.roles.includes('all') || s.roles.includes(currentRole));
@@ -436,11 +495,37 @@
             let html = `<div class="node-title">${step.title}</div><div class="node-meta">${step.desc}</div>${step.type === 'leader' ? '<span class="stack-badge">Leader Task</span>' : ''}`;
             if(step.isCustom) html += `<button class="delete-step-btn" onclick="deleteStep('${step.id}'); event.stopPropagation();">×</button>`;
             card.innerHTML = html;
-            card.onclick = (e) => { e.stopPropagation(); showPopover(step, card); };
+            
+            card.onclick = (e) => { 
+                e.stopPropagation(); 
+                showPopover(step, card);
+                updateProgress(step.phase); // Highlight bottom bar
+            };
+            
             if(colElements[step.phase]) colElements[step.phase].appendChild(card);
         });
 
         setTimeout(() => drawLines(visibleSteps), 50);
+    }
+
+    // --- PROGRESS LOGIC ---
+    function updateProgress(activePhaseIdx) {
+        document.querySelectorAll('.node-card').forEach(c => c.classList.remove('active-card'));
+        
+        for(let i=0; i<8; i++) {
+            const col = document.getElementById(`check-col-${i}`);
+            if(i <= activePhaseIdx) {
+                col.classList.add('filled');
+            } else {
+                col.classList.remove('filled');
+            }
+        }
+    }
+    
+    function resetProgress() {
+        for(let i=0; i<8; i++) {
+            document.getElementById(`check-col-${i}`)?.classList.remove('filled');
+        }
     }
 
     // --- POPOVER ---
@@ -449,6 +534,9 @@
         const wrapper = document.getElementById('scroll-area');
         const cardRect = cardEl.getBoundingClientRect();
         const wrapperRect = wrapper.getBoundingClientRect();
+
+        // Add visual highlight to card
+        cardEl.classList.add('active-card');
 
         document.getElementById('pop-title').innerText = data.title;
         document.getElementById('pop-desc').innerHTML = data.context;
@@ -465,13 +553,17 @@
         pop.style.top = topPos + 'px'; pop.style.left = leftPos + 'px';
         pop.classList.add('active'); document.getElementById('dismiss').classList.add('active');
     }
-    function hidePopover() { document.getElementById('detail-popover').classList.remove('active'); document.getElementById('dismiss').classList.remove('active'); }
+    
+    function hidePopover() { 
+        document.getElementById('detail-popover').classList.remove('active'); 
+        document.getElementById('dismiss').classList.remove('active');
+        document.querySelectorAll('.node-card').forEach(c => c.classList.remove('active-card'));
+    }
 
     // --- LINES ---
     function drawLines(visibleSteps) {
         const svg = document.getElementById('svg-layer');
         const grid = document.getElementById('main-grid');
-        // Match SVG size to Scrollable Grid
         svg.style.width = grid.scrollWidth + 'px';
         svg.style.height = grid.scrollHeight + 'px';
         
@@ -494,7 +586,6 @@
         const sRect = startEl.getBoundingClientRect();
         const eRect = endEl.getBoundingClientRect();
 
-        // Coordinates relative to SVG canvas
         const x1 = (sRect.right - svgRect.left);
         const y1 = (sRect.top + sRect.height/2 - svgRect.top);
         const x2 = (eRect.left - svgRect.left);
