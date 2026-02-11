@@ -1,408 +1,277 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>HD Onboarding Flow (Prototype)</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HD Onboarding Process Map</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --border: #e2e8f0;
+            --leader-color: #ef4444; /* Red for leader tasks */
+            --gen-color: #3b82f6; /* Blue for general tasks */
+            --doc-color: #10b981; /* Green for docs */
+        }
 
-  <!-- Mermaid (CDN) -->
-  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg);
+            margin: 0;
+            padding: 20px;
+            color: #1e293b;
+        }
 
-  <style>
-    :root{
-      --bg:#0b0f14;
-      --panel:#0f1620;
-      --card:#111b26;
-      --text:#e6edf3;
-      --muted:#9fb0c3;
-      --border:rgba(255,255,255,.08);
-      --accent:#f08200; /* HD orange vibe */
-      --ok:#33d17a;
-      --warn:#ffcc00;
-    }
-    *{box-sizing:border-box}
-    body{
-      margin:0;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-      background: radial-gradient(1200px 600px at 20% 0%, rgba(240,130,0,.12), transparent 50%),
-                  radial-gradient(900px 500px at 90% 20%, rgba(80,160,255,.10), transparent 55%),
-                  var(--bg);
-      color:var(--text);
-    }
-    .wrap{
-      max-width:1200px;
-      margin:0 auto;
-      padding:22px 16px 28px;
-    }
-    header{
-      display:flex;
-      align-items:flex-start;
-      justify-content:space-between;
-      gap:16px;
-      margin-bottom:14px;
-    }
-    .title{
-      display:flex; flex-direction:column; gap:6px;
-    }
-    .title h1{
-      margin:0;
-      font-size:18px;
-      letter-spacing:.2px;
-      font-weight:700;
-    }
-    .title p{
-      margin:0;
-      color:var(--muted);
-      font-size:13px;
-      line-height:1.35;
-      max-width:760px;
-    }
-    .controls{
-      display:flex;
-      gap:10px;
-      align-items:center;
-      background:rgba(255,255,255,.04);
-      border:1px solid var(--border);
-      padding:10px 10px;
-      border-radius:12px;
-    }
-    label{ font-size:12px; color:var(--muted); }
-    select{
-      background:transparent;
-      color:var(--text);
-      border:1px solid var(--border);
-      padding:8px 10px;
-      border-radius:10px;
-      font-size:13px;
-      outline:none;
-    }
+        /* Controls */
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            justify-content: center;
+            background: white;
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
 
-    .timeline{
-      display:grid;
-      grid-template-columns: repeat(7, 1fr);
-      gap:8px;
-      margin:14px 0 14px;
-    }
-    .tchip{
-      background:rgba(255,255,255,.03);
-      border:1px solid var(--border);
-      border-radius:12px;
-      padding:10px 10px;
-      text-align:center;
-      font-size:12px;
-      color:var(--muted);
-      position:relative;
-      overflow:hidden;
-    }
-    .tchip strong{
-      display:block;
-      color:var(--text);
-      font-weight:700;
-      font-size:12px;
-      margin-bottom:2px;
-    }
-    .tchip::after{
-      content:"";
-      position:absolute;
-      left:-20%;
-      top:-60%;
-      width:60%;
-      height:160%;
-      background:linear-gradient(90deg, transparent, rgba(240,130,0,.18), transparent);
-      transform:rotate(18deg);
-      opacity:.6;
-      pointer-events:none;
-    }
+        button {
+            padding: 10px 20px;
+            border: 2px solid var(--border);
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
 
-    .grid{
-      display:grid;
-      grid-template-columns: 1fr 340px;
-      gap:12px;
-      align-items:start;
-    }
+        button.active {
+            border-color: var(--primary);
+            background: var(--primary);
+            color: white;
+        }
 
-    .panel{
-      background:rgba(255,255,255,.03);
-      border:1px solid var(--border);
-      border-radius:16px;
-      padding:14px;
-      min-height:520px;
-    }
-    .panel h2{
-      margin:0 0 10px;
-      font-size:13px;
-      color:var(--muted);
-      font-weight:600;
-      letter-spacing:.2px;
-    }
+        /* Timeline Grid */
+        .timeline-container {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr); /* 8 Time columns */
+            gap: 15px;
+            overflow-x: auto;
+            padding-bottom: 20px;
+            min-width: 1200px;
+        }
 
-    .side{
-      display:flex;
-      flex-direction:column;
-      gap:12px;
-    }
-    .card{
-      background:rgba(255,255,255,.03);
-      border:1px solid var(--border);
-      border-radius:16px;
-      padding:14px;
-    }
-    .card h3{
-      margin:0 0 10px;
-      font-size:13px;
-      color:var(--text);
-      font-weight:700;
-    }
+        .time-header {
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            color: var(--secondary);
+            text-align: center;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 10px;
+            margin-bottom: 10px;
+        }
 
-    .chips{
-      display:flex; flex-wrap:wrap; gap:8px;
-    }
-    .chip{
-      border:1px solid var(--border);
-      background:rgba(255,255,255,.02);
-      border-radius:999px;
-      padding:7px 10px;
-      font-size:12px;
-      color:var(--muted);
-      display:flex;
-      align-items:center;
-      gap:8px;
-      cursor:pointer;
-      user-select:none;
-    }
-    .dot{
-      width:8px; height:8px; border-radius:99px;
-      background:rgba(255,255,255,.18);
-    }
-    .chip[data-state="ok"] .dot{ background:var(--ok); }
-    .chip[data-state="warn"] .dot{ background:var(--warn); }
-    .chip[data-state="off"] .dot{ background:rgba(255,255,255,.18); }
+        /* Lanes */
+        .swimlane {
+            grid-column: 1 / -1;
+            display: grid;
+            grid-template-columns: subgrid;
+            margin-bottom: 20px;
+            min-height: 150px;
+            position: relative;
+        }
 
-    .details{
-      margin-top:12px;
-      border-top:1px solid var(--border);
-      padding-top:12px;
-      color:var(--muted);
-      font-size:12.5px;
-      line-height:1.45;
-      min-height:120px;
-    }
-    .details strong{ color:var(--text); }
+        .swimlane-label {
+            position: absolute;
+            left: -120px;
+            top: 20px;
+            font-weight: bold;
+            width: 100px;
+            text-align: right;
+            font-size: 0.9rem;
+        }
 
-    /* Mermaid theme overrides */
-    .mermaid{
-      background:transparent !important;
-      border-radius:12px;
-      overflow:auto;
-    }
-    /* Make Mermaid text readable on dark */
-    .mermaid svg{
-      max-width:100%;
-      height:auto;
-    }
+        /* Cards */
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 0.85rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            position: relative;
+            transition: transform 0.2s;
+            margin-bottom: 10px;
+            border-left: 4px solid var(--secondary);
+        }
 
-    @media (max-width: 980px){
-      .grid{ grid-template-columns: 1fr; }
-      .timeline{ grid-template-columns: repeat(4, 1fr); }
-    }
-  </style>
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            z-index: 10;
+        }
+
+        .card.leader { border-left-color: var(--leader-color); }
+        .card.general { border-left-color: var(--gen-color); }
+        .card.docs { border-left-color: var(--doc-color); }
+
+        .card-title { font-weight: 700; margin-bottom: 4px; }
+        .card-detail { font-size: 0.75rem; color: var(--secondary); line-height: 1.4; }
+        
+        /* Checkpoints Bar */
+        .checkpoint-bar {
+            grid-column: 1 / -1;
+            display: grid;
+            grid-template-columns: subgrid;
+            background: #eef2f6;
+            border-radius: 8px;
+            padding: 10px 0;
+            margin-top: 20px;
+        }
+
+        .check-node {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 0.75rem;
+            color: var(--secondary);
+            text-align: center;
+            padding: 0 5px;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            background: #cbd5e1;
+            border-radius: 50%;
+            margin-bottom: 5px;
+        }
+        
+        .active-dot { background: var(--primary); }
+
+        /* Helpers */
+        .hidden { display: none; }
+
+    </style>
 </head>
-
 <body>
-  <div class="wrap">
-    <header>
-      <div class="title">
-        <h1>Onboarding Flow (Prototype)</h1>
-        <p>
-          Timeline-based onboarding model with persona-based branching. Leaders include a Go Day Plan due by Day 30.
-          Checkpoints start on Day 1 for everyone.
-        </p>
-      </div>
 
-      <div class="controls">
-        <label for="persona">Persona</label>
-        <select id="persona">
-          <option value="newhire">New Hire (Employee)</option>
-          <option value="newleader">New Leader</option>
-          <option value="promotion">Promotion to Leader</option>
-        </select>
-      </div>
-    </header>
-
-    <div class="timeline" aria-label="Timeline">
-      <div class="tchip"><strong>Day 1</strong>Welcome + Contract</div>
-      <div class="tchip"><strong>Week 1</strong>Initial setup</div>
-      <div class="tchip"><strong>Week 2</strong>Role ramp</div>
-      <div class="tchip"><strong>Day 30</strong>Alignment milestone</div>
-      <div class="tchip"><strong>Day 45</strong>Checkpoint</div>
-      <div class="tchip"><strong>Day 60</strong>Checkpoint</div>
-      <div class="tchip"><strong>Day 90</strong>Outcome artifacts</div>
+    <div class="controls">
+        <button onclick="setPersona('general')" id="btn-gen">General Employee (N-1)</button>
+        <button onclick="setPersona('new_leader')" id="btn-new">New Leader</button>
+        <button onclick="setPersona('promo_leader')" id="btn-promo">Promoted Leader</button>
     </div>
 
-    <div class="grid">
-      <section class="panel">
-        <h2>Flow Diagram</h2>
-        <div id="diagram" class="mermaid"></div>
-      </section>
+    <div class="timeline-container">
+        <div class="time-header">Trigger</div>
+        <div class="time-header">Day 1</div>
+        <div class="time-header">Week 1</div>
+        <div class="time-header">Week 2</div>
+        <div class="time-header">30 Days</div>
+        <div class="time-header">45 Days</div>
+        <div class="time-header">60 Days</div>
+        <div class="time-header">90 Days</div>
 
-      <aside class="side">
-        <div class="card">
-          <h3>Checkpoints (start Day 1)</h3>
-          <div class="chips" id="checkpointChips">
-            <div class="chip" data-key="employee" data-state="ok" title="Click for details">
-              <span class="dot"></span> Employee
+        <div class="swimlane" id="main-flow">
             </div>
-            <div class="chip" data-key="leader" data-state="warn" title="Click for details">
-              <span class="dot"></span> Leader
-            </div>
-            <div class="chip" data-key="docs" data-state="warn" title="Click for details">
-              <span class="dot"></span> Documentation
-            </div>
-          </div>
 
-          <div class="details" id="details">
-            <strong>How to use:</strong> select a persona. Click a checkpoint to see what it means and what “done” looks like.
-          </div>
+        <div class="checkpoint-bar">
+            <div class="check-node"><div class="dot active-dot"></div>Trigger</div>
+            <div class="check-node"><div class="dot active-dot"></div>Contract Signed<br>Doc Check</div>
+            <div class="check-node"><div class="dot"></div>Weekly Check</div>
+            <div class="check-node"><div class="dot"></div>Weekly Check</div>
+            <div class="check-node"><div class="dot"></div>30 Day Review</div>
+            <div class="check-node"><div class="dot"></div>45 Day Check</div>
+            <div class="check-node"><div class="dot"></div>60 Day Check</div>
+            <div class="check-node"><div class="dot"></div>90 Day Final</div>
         </div>
-
-        <div class="card">
-          <h3>Node Info (click nodes)</h3>
-          <div class="details" id="nodeInfo">
-            <strong>Tip:</strong> in the next iteration we’ll wire each node to a right-panel detail view (owner, templates, links).
-            For now, this prototype locks the structure + English labels.
-          </div>
-        </div>
-      </aside>
     </div>
-  </div>
 
-  <script>
-    // Mermaid init (dark-friendly)
-    mermaid.initialize({
-      startOnLoad: false,
-      theme: "dark",
-      themeVariables: {
-        primaryColor: "rgba(255,255,255,0.04)",
-        primaryTextColor: "#e6edf3",
-        primaryBorderColor: "rgba(255,255,255,0.10)",
-        lineColor: "rgba(255,255,255,0.20)",
-        secondaryColor: "rgba(240,130,0,0.10)",
-        tertiaryColor: "rgba(80,160,255,0.10)",
-        fontFamily: "ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial",
-        fontSize: "12px"
-      },
-      flowchart: { curve: "basis" }
-    });
+    <script>
+        // Data Structure matching your whiteboard logic
+        const steps = [
+            // TRIGGER PHASE
+            { id: 1, title: "Candidate Accepts Offer", detail: "Process Trigger", phase: 0, type: "general", personas: ["all"] },
+            { id: 2, title: "Request Entry Docs", detail: "Checklist sent to candidate", phase: 0, type: "docs", personas: ["all"] },
 
-    const diagrams = {
-      newhire: `
-flowchart LR
-  A([Trigger: Offer Accepted])
-  B([Day 1: General Welcome<br/>+ Contract Signed])
-  C([Documentation Intake<br/>(collect required docs)])
-  D([Entry Announcement])
-  E([Week 1: Setup + Access + Expectations])
-  F([Week 2: Role Ramp + Training])
-  G([Day 30: 30-Day Check-in])
-  H([Day 45: Progress Check])
-  I([Day 60: Progress Check])
-  J([Day 90: Onboarding Outcomes Review])
+            // DAY 1
+            { id: 3, title: "General Welcome", detail: "Office tour & Introductions", phase: 1, type: "general", personas: ["all"] },
+            { id: 4, title: "Sign Contract", detail: "Legal requirement met", phase: 1, type: "docs", personas: ["all"] },
+            { id: 5, title: "Entry Announcement", detail: "Email to Org (New Hire)", phase: 1, type: "general", personas: ["general", "new_leader"] },
+            { id: 6, title: "Promotion Announcement", detail: "Email to Org (Internal)", phase: 1, type: "leader", personas: ["promo_leader"] },
 
-  A --> B --> C --> D --> E --> F --> G --> H --> I --> J
-`,
-      newleader: `
-flowchart LR
-  A([Trigger: Offer Accepted])
-  B([Day 1: General Welcome<br/>+ Contract Signed])
-  C([Documentation Intake<br/>(collect required docs)])
-  D([Entry Announcement])
-  E([Stakeholder Alignment<br/>(Day 1–30)])
-  F([Go Day Plan (Due Day 30)<br/>Draft + Reviewed with Manager])
-  G([Day 45: Progress Check])
-  H([Day 60: Progress Check])
-  I([Day 90: Deliverables<br/>Action Plan + MBOs + SWOT + Team Diagnostic])
+            // WEEK 1 & 2
+            { id: 7, title: "Onboarding Training", detail: "Core Modules", phase: 2, type: "general", personas: ["all"] },
+            { id: 8, title: "Team Intros", detail: "Initial meet & greets", phase: 3, type: "general", personas: ["all"] },
 
-  A --> B --> C --> D --> E --> F --> G --> H --> I
-`,
-      promotion: `
-flowchart LR
-  A([Trigger: Promotion Confirmed])
-  B([Day 1: General Welcome<br/>+ Contract/Letter Signed])
-  D([Entry Announcement])
-  E([Stakeholder Alignment<br/>(Day 1–30)])
-  F([Go Day Plan (Due Day 30)<br/>Draft + Reviewed with Manager])
-  G([Day 45: Progress Check])
-  H([Day 60: Progress Check])
-  I([Day 90: Deliverables<br/>Action Plan + MBOs + SWOT + Team Diagnostic])
+            // 30 DAYS
+            { id: 9, title: "Go Day Plan", detail: "Creation: Focus areas & structure. Review with Manager.", phase: 4, type: "leader", personas: ["new_leader", "promo_leader"] },
+            { id: 10, title: "Stakeholder Meetings", detail: "Input for Go Day Plan", phase: 4, type: "leader", personas: ["new_leader", "promo_leader"] },
 
-  A --> B --> D --> E --> F --> G --> H --> I
-`
-    };
+            // 60 DAYS
+            { id: 11, title: "60-Day Progress", detail: "Review Go Day Plan execution", phase: 6, type: "leader", personas: ["new_leader", "promo_leader"] },
 
-    const checkpointText = {
-      employee: {
-        title: "Employee Checkpoints (Day 1+)",
-        body: `
-Tracks the person’s onboarding ramp: access, expectations, training, and 30/45/60/90 touchpoints.
-<strong>Done looks like:</strong> required onboarding steps completed and check-ins documented.
-        `.trim()
-      },
-      leader: {
-        title: "Leader Checkpoints (Day 1+)",
-        body: `
-Applies to New Leaders + Promotions. Includes stakeholder alignment and the Go Day Plan due by Day 30.
-<strong>Done looks like:</strong> Go Day Plan drafted and reviewed with manager; 45/60/90 reviews completed.
-        `.trim()
-      },
-      docs: {
-        title: "Documentation Checkpoints (Day 1+)",
-        body: `
-Tracks required documentation completion early in onboarding.
-<strong>Done looks like:</strong> all required documents collected/validated and stored per process.
-        `.trim()
-      }
-    };
+            // 90 DAYS (Deliverables)
+            { id: 12, title: "Full Action Plan", detail: "Long term strategy", phase: 7, type: "leader", personas: ["new_leader", "promo_leader"] },
+            { id: 13, title: "MBOs Definition", detail: "Management by Objectives", phase: 7, type: "leader", personas: ["new_leader", "promo_leader"] },
+            { id: 14, title: "SWOT Analysis", detail: "Team/Dept analysis", phase: 7, type: "leader", personas: ["new_leader", "promo_leader"] },
+            { id: 15, title: "Team Diagnostic", detail: "Talent assessment", phase: 7, type: "leader", personas: ["new_leader", "promo_leader"] },
+            
+            // Employee 90 Day
+            { id: 16, title: "Probation Review", detail: "Performance confirm", phase: 7, type: "general", personas: ["general"] }
+        ];
 
-    function setCheckpointStates(persona){
-      const leaderOn = (persona === "newleader" || persona === "promotion");
-      document.querySelectorAll(".chip").forEach(chip => {
-        const key = chip.dataset.key;
-        let state = "warn";
-        if (key === "leader") state = leaderOn ? "warn" : "off";
-        if (key === "employee") state = "ok";
-        if (key === "docs") state = "warn";
-        chip.dataset.state = state;
-      });
-    }
+        // Configuration
+        const phases = [0, 1, 2, 3, 4, 5, 6, 7]; // Corresponds to columns
+        
+        function setPersona(persona) {
+            // Update buttons
+            document.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+            if(persona === 'general') document.getElementById('btn-gen').classList.add('active');
+            if(persona === 'new_leader') document.getElementById('btn-new').classList.add('active');
+            if(persona === 'promo_leader') document.getElementById('btn-promo').classList.add('active');
 
-    async function renderDiagram(persona){
-      const el = document.getElementById("diagram");
-      el.textContent = diagrams[persona].trim();
-      await mermaid.run({ querySelector: "#diagram" });
-      setCheckpointStates(persona);
-    }
+            render(persona);
+        }
 
-    // Persona selector
-    const personaSelect = document.getElementById("persona");
-    personaSelect.addEventListener("change", () => {
-      renderDiagram(personaSelect.value);
-      document.getElementById("nodeInfo").innerHTML =
-        "<strong>Next:</strong> we’ll make nodes clickable to show owners, templates, and links (Confluence/SharePoint/GitHub).";
-    });
+        function render(currentPersona) {
+            const container = document.getElementById('main-flow');
+            container.innerHTML = ''; // Clear current
 
-    // Checkpoint chip details
-    document.getElementById("checkpointChips").addEventListener("click", (e) => {
-      const chip = e.target.closest(".chip");
-      if (!chip) return;
-      const key = chip.dataset.key;
-      const info = checkpointText[key];
-      document.getElementById("details").innerHTML =
-        `<strong>${info.title}</strong><br/><br/>${info.body}`;
-    });
+            // Create columns for the grid
+            // We iterate through phases 0 to 7 to ensure grid structure holds
+            for (let i = 0; i < 8; i++) {
+                const column = document.createElement('div');
+                column.style.gridColumn = `${i + 1} / span 1`;
+                column.style.display = 'flex';
+                column.style.flexDirection = 'column';
+                column.style.gap = '10px';
 
-    // Initial render
-    renderDiagram("newhire");
-  </script>
+                // Find steps for this phase and persona
+                const columnSteps = steps.filter(step => 
+                    step.phase === i && 
+                    (step.personas.includes('all') || step.personas.includes(currentPersona))
+                );
+
+                columnSteps.forEach(step => {
+                    const card = document.createElement('div');
+                    card.className = `card ${step.type}`;
+                    card.innerHTML = `
+                        <div class="card-title">${step.title}</div>
+                        <div class="card-detail">${step.detail}</div>
+                    `;
+                    column.appendChild(card);
+                });
+
+                container.appendChild(column);
+            }
+        }
+
+        // Initialize
+        setPersona('new_leader');
+
+    </script>
 </body>
 </html>
-
