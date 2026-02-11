@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HD Onboarding Process Map</title>
+    <title>HD Onboarding Process - Flow View</title>
     <style>
         :root {
             --primary: #2563eb;
             --secondary: #64748b;
             --bg: #f8fafc;
             --card-bg: #ffffff;
-            --border: #e2e8f0;
-            --leader-color: #ef4444; /* Red for leader tasks */
-            --gen-color: #3b82f6; /* Blue for general tasks */
-            --doc-color: #10b981; /* Green for docs */
+            --border: #cbd5e1;
+            --leader-color: #ef4444; 
+            --gen-color: #3b82f6; 
+            --doc-color: #10b981; 
         }
 
         body {
@@ -22,255 +22,363 @@
             margin: 0;
             padding: 20px;
             color: #1e293b;
+            overflow-x: hidden;
         }
 
-        /* Controls */
-        .controls {
+        /* Top Controls */
+        .header-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            padding: 0 20px;
+        }
+
+        .title-block h1 { margin: 0; font-size: 1.5rem; }
+        .title-block p { margin: 5px 0 0; color: var(--secondary); font-size: 0.9rem; }
+
+        .btn-group {
             display: flex;
             gap: 10px;
-            margin-bottom: 30px;
-            justify-content: center;
             background: white;
-            padding: 15px;
-            border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            padding: 5px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
 
         button {
-            padding: 10px 20px;
-            border: 2px solid var(--border);
-            background: white;
-            border-radius: 8px;
+            padding: 8px 16px;
+            border: 1px solid transparent;
+            background: transparent;
+            border-radius: 6px;
             cursor: pointer;
+            font-size: 0.85rem;
             font-weight: 600;
+            color: var(--secondary);
             transition: all 0.2s;
         }
 
+        button:hover { background: #f1f5f9; }
+
         button.active {
-            border-color: var(--primary);
-            background: var(--primary);
-            color: white;
+            background: white;
+            border-color: var(--border);
+            color: var(--primary);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
         }
 
-        /* Timeline Grid */
-        .timeline-container {
-            display: grid;
-            grid-template-columns: repeat(8, 1fr); /* 8 Time columns */
-            gap: 15px;
-            overflow-x: auto;
-            padding-bottom: 20px;
-            min-width: 1200px;
-        }
-
-        .time-header {
-            font-weight: 700;
-            text-transform: uppercase;
-            font-size: 0.85rem;
-            color: var(--secondary);
-            text-align: center;
-            border-bottom: 2px solid var(--border);
-            padding-bottom: 10px;
-            margin-bottom: 10px;
-        }
-
-        /* Lanes */
-        .swimlane {
-            grid-column: 1 / -1;
-            display: grid;
-            grid-template-columns: subgrid;
-            margin-bottom: 20px;
-            min-height: 150px;
+        /* Diagram Canvas */
+        .diagram-container {
             position: relative;
+            width: 100%;
+            overflow-x: auto;
+            padding-bottom: 50px;
+            min-height: 600px;
         }
 
-        .swimlane-label {
+        /* The SVG Layer for Arrows */
+        #connections-layer {
             position: absolute;
-            left: -120px;
-            top: 20px;
-            font-weight: bold;
-            width: 100px;
-            text-align: right;
-            font-size: 0.9rem;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none; /* Let clicks pass through to cards */
+            z-index: 0;
         }
 
-        /* Cards */
-        .card {
-            background: var(--card-bg);
+        /* Grid Setup */
+        .grid-layout {
+            display: grid;
+            grid-template-columns: repeat(8, minmax(180px, 1fr));
+            gap: 40px; /* Wider gap for arrows */
+            position: relative;
+            z-index: 1;
+            min-width: 1400px; /* Ensure horizontal scroll if needed */
+            padding: 20px;
+        }
+
+        .column-header {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--secondary);
+            font-weight: 700;
+            text-align: center;
+            padding-bottom: 20px;
+            border-bottom: 1px dashed var(--border);
+            margin-bottom: 20px;
+        }
+
+        /* Card Styles */
+        .node-card {
+            background: white;
             border: 1px solid var(--border);
             border-radius: 8px;
-            padding: 12px;
-            font-size: 0.85rem;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
             position: relative;
-            transition: transform 0.2s;
-            margin-bottom: 10px;
-            border-left: 4px solid var(--secondary);
+            z-index: 2;
         }
 
-        .card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            z-index: 10;
+        .node-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            border-color: var(--primary);
         }
 
-        .card.leader { border-left-color: var(--leader-color); }
-        .card.general { border-left-color: var(--gen-color); }
-        .card.docs { border-left-color: var(--doc-color); }
+        /* Role Indicators */
+        .node-card.leader { border-left: 4px solid var(--leader-color); }
+        .node-card.general { border-left: 4px solid var(--gen-color); }
+        .node-card.docs { border-left: 4px solid var(--doc-color); }
 
-        .card-title { font-weight: 700; margin-bottom: 4px; }
-        .card-detail { font-size: 0.75rem; color: var(--secondary); line-height: 1.4; }
-        
-        /* Checkpoints Bar */
-        .checkpoint-bar {
-            grid-column: 1 / -1;
-            display: grid;
-            grid-template-columns: subgrid;
-            background: #eef2f6;
-            border-radius: 8px;
-            padding: 10px 0;
-            margin-top: 20px;
+        .node-title { font-weight: 700; font-size: 0.9rem; margin-bottom: 5px; }
+        .node-meta { font-size: 0.75rem; color: var(--secondary); line-height: 1.4; }
+
+        /* Document/Stack Badge */
+        .stack-badge {
+            background: #f1f5f9;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.65rem;
+            display: inline-block;
+            margin-top: 8px;
+            font-weight: 600;
+            color: var(--secondary);
         }
 
-        .check-node {
+        /* Checkpoint Footer */
+        .checkpoints-wrapper {
+            margin-top: 40px;
+            border-top: 2px solid #e2e8f0;
+            padding-top: 20px;
             display: flex;
-            flex-direction: column;
-            align-items: center;
+            justify-content: space-between;
+            min-width: 1400px;
+            padding-left: 20px;
+            padding-right: 20px;
+        }
+
+        .checkpoint {
+            text-align: center;
             font-size: 0.75rem;
             color: var(--secondary);
-            text-align: center;
-            padding: 0 5px;
-        }
-
-        .dot {
-            width: 10px;
-            height: 10px;
-            background: #cbd5e1;
-            border-radius: 50%;
-            margin-bottom: 5px;
+            position: relative;
         }
         
-        .active-dot { background: var(--primary); }
-
-        /* Helpers */
-        .hidden { display: none; }
+        .checkpoint::before {
+            content: '';
+            width: 12px;
+            height: 12px;
+            background: white;
+            border: 2px solid var(--primary);
+            border-radius: 50%;
+            position: absolute;
+            top: -27px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 3;
+        }
 
     </style>
 </head>
 <body>
 
-    <div class="controls">
-        <button onclick="setPersona('general')" id="btn-gen">General Employee (N-1)</button>
-        <button onclick="setPersona('new_leader')" id="btn-new">New Leader</button>
-        <button onclick="setPersona('promo_leader')" id="btn-promo">Promoted Leader</button>
+    <div class="header-controls">
+        <div class="title-block">
+            <h1>Onboarding Map</h1>
+            <p>Interactive Process View</p>
+        </div>
+        <div class="btn-group">
+            <button onclick="updateView('general')" id="btn-gen">General Employee</button>
+            <button onclick="updateView('new_leader')" id="btn-new" class="active">New Leader</button>
+            <button onclick="updateView('promo_leader')" id="btn-promo">Promoted Leader</button>
+        </div>
     </div>
 
-    <div class="timeline-container">
-        <div class="time-header">Trigger</div>
-        <div class="time-header">Day 1</div>
-        <div class="time-header">Week 1</div>
-        <div class="time-header">Week 2</div>
-        <div class="time-header">30 Days</div>
-        <div class="time-header">45 Days</div>
-        <div class="time-header">60 Days</div>
-        <div class="time-header">90 Days</div>
+    <div class="diagram-container">
+        <svg id="connections-layer" width="100%" height="100%">
+            <defs>
+                <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+                <polygon points="0 0, 10 3.5, 0 7" fill="#94a3b8" />
+                </marker>
+            </defs>
+            </svg>
 
-        <div class="swimlane" id="main-flow">
+        <div class="grid-layout" id="grid-content">
+            <div class="column-header">Trigger</div>
+            <div class="column-header">Day 1</div>
+            <div class="column-header">Week 1</div>
+            <div class="column-header">Week 2</div>
+            <div class="column-header">30 Days</div>
+            <div class="column-header">45 Days</div>
+            <div class="column-header">60 Days</div>
+            <div class="column-header">90 Days</div>
+            
             </div>
 
-        <div class="checkpoint-bar">
-            <div class="check-node"><div class="dot active-dot"></div>Trigger</div>
-            <div class="check-node"><div class="dot active-dot"></div>Contract Signed<br>Doc Check</div>
-            <div class="check-node"><div class="dot"></div>Weekly Check</div>
-            <div class="check-node"><div class="dot"></div>Weekly Check</div>
-            <div class="check-node"><div class="dot"></div>30 Day Review</div>
-            <div class="check-node"><div class="dot"></div>45 Day Check</div>
-            <div class="check-node"><div class="dot"></div>60 Day Check</div>
-            <div class="check-node"><div class="dot"></div>90 Day Final</div>
+        <div class="checkpoints-wrapper">
+            <div class="checkpoint">Trigger</div>
+            <div class="checkpoint">Contract/Docs</div>
+            <div class="checkpoint">Weekly Check</div>
+            <div class="checkpoint">Team Intro</div>
+            <div class="checkpoint">30-Day Check</div>
+            <div class="checkpoint">45-Day Check</div>
+            <div class="checkpoint">60-Day Check</div>
+            <div class="checkpoint">Final Review</div>
         </div>
     </div>
 
     <script>
-        // Data Structure matching your whiteboard logic
-        const steps = [
-            // TRIGGER PHASE
-            { id: 1, title: "Candidate Accepts Offer", detail: "Process Trigger", phase: 0, type: "general", personas: ["all"] },
-            { id: 2, title: "Request Entry Docs", detail: "Checklist sent to candidate", phase: 0, type: "docs", personas: ["all"] },
-
-            // DAY 1
-            { id: 3, title: "General Welcome", detail: "Office tour & Introductions", phase: 1, type: "general", personas: ["all"] },
-            { id: 4, title: "Sign Contract", detail: "Legal requirement met", phase: 1, type: "docs", personas: ["all"] },
-            { id: 5, title: "Entry Announcement", detail: "Email to Org (New Hire)", phase: 1, type: "general", personas: ["general", "new_leader"] },
-            { id: 6, title: "Promotion Announcement", detail: "Email to Org (Internal)", phase: 1, type: "leader", personas: ["promo_leader"] },
-
-            // WEEK 1 & 2
-            { id: 7, title: "Onboarding Training", detail: "Core Modules", phase: 2, type: "general", personas: ["all"] },
-            { id: 8, title: "Team Intros", detail: "Initial meet & greets", phase: 3, type: "general", personas: ["all"] },
-
-            // 30 DAYS
-            { id: 9, title: "Go Day Plan", detail: "Creation: Focus areas & structure. Review with Manager.", phase: 4, type: "leader", personas: ["new_leader", "promo_leader"] },
-            { id: 10, title: "Stakeholder Meetings", detail: "Input for Go Day Plan", phase: 4, type: "leader", personas: ["new_leader", "promo_leader"] },
-
-            // 60 DAYS
-            { id: 11, title: "60-Day Progress", detail: "Review Go Day Plan execution", phase: 6, type: "leader", personas: ["new_leader", "promo_leader"] },
-
-            // 90 DAYS (Deliverables)
-            { id: 12, title: "Full Action Plan", detail: "Long term strategy", phase: 7, type: "leader", personas: ["new_leader", "promo_leader"] },
-            { id: 13, title: "MBOs Definition", detail: "Management by Objectives", phase: 7, type: "leader", personas: ["new_leader", "promo_leader"] },
-            { id: 14, title: "SWOT Analysis", detail: "Team/Dept analysis", phase: 7, type: "leader", personas: ["new_leader", "promo_leader"] },
-            { id: 15, title: "Team Diagnostic", detail: "Talent assessment", phase: 7, type: "leader", personas: ["new_leader", "promo_leader"] },
+        // --- DATA MODEL ---
+        // 'phase' corresponds to the grid column (0-7)
+        // 'connectTo' is the ID of the next card in the flow
+        const processData = [
+            { id: 'trig', title: "Offer Accepted", desc: "Trigger Event", phase: 0, type: 'general', roles: ['all'], connectTo: ['welc', 'doc_req'] },
+            { id: 'doc_req', title: "Request Docs", desc: "Send checklist", phase: 0, type: 'docs', roles: ['all'], connectTo: ['sign'] },
             
-            // Employee 90 Day
-            { id: 16, title: "Probation Review", detail: "Performance confirm", phase: 7, type: "general", personas: ["general"] }
+            { id: 'welc', title: "General Welcome", desc: "Day 1 Logistics", phase: 1, type: 'general', roles: ['all'], connectTo: ['train'] },
+            { id: 'sign', title: "Sign Contract", desc: "Legal Signature", phase: 1, type: 'docs', roles: ['all'], connectTo: [] },
+            
+            { id: 'comm_gen', title: "Entry Announcement", desc: "Email to Org", phase: 1, type: 'general', roles: ['general'], connectTo: ['train'] },
+            { id: 'comm_lead', title: "Entry Announcement", desc: "Email to Org (Leader)", phase: 1, type: 'leader', roles: ['new_leader'], connectTo: ['go_day'] },
+            { id: 'comm_promo', title: "Promotion Comms", desc: "Internal Comms", phase: 1, type: 'leader', roles: ['promo_leader'], connectTo: ['go_day'] },
+
+            { id: 'train', title: "Onboarding Training", desc: "Core Modules", phase: 2, type: 'general', roles: ['all'], connectTo: ['intro'] },
+            
+            { id: 'intro', title: "Team Intros", desc: "Meet & Greet", phase: 3, type: 'general', roles: ['all'], connectTo: [] },
+
+            { id: 'go_day', title: "Go Day Plan", desc: "Create 30-Day Focus Plan", phase: 4, type: 'leader', roles: ['new_leader', 'promo_leader'], connectTo: ['review_60'] },
+            
+            { id: 'review_60', title: "60-Day Progress", desc: "Review Plan Execution", phase: 6, type: 'leader', roles: ['new_leader', 'promo_leader'], connectTo: ['final_90'] },
+
+            { id: 'final_90', title: "90-Day Deliverables", desc: "MBOs, SWOT, Strategy", phase: 7, type: 'leader', roles: ['new_leader', 'promo_leader'], connectTo: [] },
+            { id: 'probation', title: "Probation Review", desc: "Performance Confirmation", phase: 7, type: 'general', roles: ['general'], connectTo: [] }
         ];
 
-        // Configuration
-        const phases = [0, 1, 2, 3, 4, 5, 6, 7]; // Corresponds to columns
-        
-        function setPersona(persona) {
-            // Update buttons
+        let currentRole = 'new_leader';
+
+        function updateView(role) {
+            currentRole = role;
+            
+            // Toggle Buttons
             document.querySelectorAll('button').forEach(b => b.classList.remove('active'));
-            if(persona === 'general') document.getElementById('btn-gen').classList.add('active');
-            if(persona === 'new_leader') document.getElementById('btn-new').classList.add('active');
-            if(persona === 'promo_leader') document.getElementById('btn-promo').classList.add('active');
+            if(role === 'general') document.getElementById('btn-gen').classList.add('active');
+            if(role === 'new_leader') document.getElementById('btn-new').classList.add('active');
+            if(role === 'promo_leader') document.getElementById('btn-promo').classList.add('active');
 
-            render(persona);
+            renderCards();
         }
 
-        function render(currentPersona) {
-            const container = document.getElementById('main-flow');
-            container.innerHTML = ''; // Clear current
+        function renderCards() {
+            const grid = document.getElementById('grid-content');
+            // Clear existing cards (but keep headers - first 8 elements)
+            const headers = Array.from(document.querySelectorAll('.column-header'));
+            grid.innerHTML = '';
+            headers.forEach(h => grid.appendChild(h));
 
-            // Create columns for the grid
-            // We iterate through phases 0 to 7 to ensure grid structure holds
-            for (let i = 0; i < 8; i++) {
-                const column = document.createElement('div');
-                column.style.gridColumn = `${i + 1} / span 1`;
-                column.style.display = 'flex';
-                column.style.flexDirection = 'column';
-                column.style.gap = '10px';
+            // 1. Filter Data
+            const visibleNodes = processData.filter(node => 
+                node.roles.includes('all') || node.roles.includes(currentRole)
+            );
 
-                // Find steps for this phase and persona
-                const columnSteps = steps.filter(step => 
-                    step.phase === i && 
-                    (step.personas.includes('all') || step.personas.includes(currentPersona))
-                );
+            // 2. Place Cards in Grid
+            // We need to track how many items are in each column to stack them vertically
+            const columnCounts = [0,0,0,0,0,0,0,0];
 
-                columnSteps.forEach(step => {
-                    const card = document.createElement('div');
-                    card.className = `card ${step.type}`;
-                    card.innerHTML = `
-                        <div class="card-title">${step.title}</div>
-                        <div class="card-detail">${step.detail}</div>
-                    `;
-                    column.appendChild(card);
+            visibleNodes.forEach(node => {
+                const card = document.createElement('div');
+                card.className = `node-card ${node.type}`;
+                card.id = `card-${node.id}`;
+                
+                // Grid Position
+                // Row starts at 2 because Row 1 is headers
+                // We stack them automatically using grid-auto-flow, but let's force columns
+                card.style.gridColumn = node.phase + 1; 
+                
+                card.innerHTML = `
+                    <div class="node-title">${node.title}</div>
+                    <div class="node-meta">${node.desc}</div>
+                    ${node.type === 'leader' ? '<span class="stack-badge">Leader Task</span>' : ''}
+                `;
+                
+                grid.appendChild(card);
+            });
+
+            // 3. Draw Lines (Wait for DOM render)
+            setTimeout(drawLines, 50);
+        }
+
+        function drawLines() {
+            const svg = document.getElementById('connections-layer');
+            svg.innerHTML = `
+                <defs>
+                    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                        <polygon points="0 0, 10 3.5, 0 7" fill="#94a3b8" />
+                    </marker>
+                </defs>
+            `;
+
+            const visibleNodes = processData.filter(node => 
+                node.roles.includes('all') || node.roles.includes(currentRole)
+            );
+
+            visibleNodes.forEach(sourceNode => {
+                const sourceEl = document.getElementById(`card-${sourceNode.id}`);
+                if (!sourceEl) return;
+
+                sourceNode.connectTo.forEach(targetId => {
+                    // Check if target is visible in current view
+                    const isTargetVisible = visibleNodes.some(n => n.id === targetId);
+                    if (!isTargetVisible) return;
+
+                    const targetEl = document.getElementById(`card-${targetId}`);
+                    if (targetEl) {
+                        createPath(svg, sourceEl, targetEl);
+                    }
                 });
-
-                container.appendChild(column);
-            }
+            });
         }
 
-        // Initialize
-        setPersona('new_leader');
+        function createPath(svg, startEl, endEl) {
+            const svgRect = svg.getBoundingClientRect();
+            const startRect = startEl.getBoundingClientRect();
+            const endRect = endEl.getBoundingClientRect();
+
+            // Calculate Start Point (Right center of source)
+            const x1 = startRect.right - svgRect.left;
+            const y1 = startRect.top + (startRect.height / 2) - svgRect.top;
+
+            // Calculate End Point (Left center of target)
+            const x2 = endRect.left - svgRect.left;
+            const y2 = endRect.top + (endRect.height / 2) - svgRect.top;
+
+            // Bezier Curve Logic
+            const dist = x2 - x1;
+            const controlOffset = dist * 0.5; // Curvature intensity
+
+            const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            
+            // M = Move to, C = Cubic Bezier (Control1, Control2, End)
+            const d = `M ${x1} ${y1} C ${x1 + controlOffset} ${y1}, ${x2 - controlOffset} ${y2}, ${x2} ${y2}`;
+            
+            path.setAttribute("d", d);
+            path.setAttribute("stroke", "#cbd5e1");
+            path.setAttribute("stroke-width", "2");
+            path.setAttribute("fill", "none");
+            path.setAttribute("marker-end", "url(#arrowhead)");
+
+            svg.appendChild(path);
+        }
+
+        // Handle Resize to redraw lines
+        window.addEventListener('resize', drawLines);
+
+        // Init
+        updateView('new_leader');
 
     </script>
 </body>
