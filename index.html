@@ -1,563 +1,594 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HD Onboarding - Final V4</title>
-    <style>
-        :root {
-            --primary: #2563eb;
-            --secondary: #64748b;
-            --bg: #f8fafc;
-            --card-bg: #ffffff;
-            --border: #cbd5e1;
-            --leader-color: #ef4444; 
-            --gen-color: #3b82f6; 
-            --doc-color: #10b981; 
-            --column-even: #f1f5f9;
-            --column-odd: #ffffff;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HD Onboarding - Final Model</title>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --secondary: #64748b;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --border: #cbd5e1;
+      --leader-color: #ef4444;
+      --gen-color: #3b82f6;
+      --doc-color: #10b981;
+      --column-even: #f1f5f9;
+      --column-odd: #ffffff;
 
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background-color: var(--bg);
-            margin: 0;
-            padding: 0;
-            color: #1e293b;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden; 
-        }
+      --line: #cbd5e1;
+      --arrow: #94a3b8;
+    }
 
-        /* --- Header & Controls --- */
-        .header-controls {
-            background: white;
-            padding: 15px 30px;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            z-index: 50;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
-            flex-shrink: 0; /* Don't shrink header */
-        }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg);
+      margin: 0;
+      padding: 0;
+      color: #1e293b;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
 
-        .title-block h1 { margin: 0; font-size: 1.25rem; }
-        .title-block p { margin: 2px 0 0; color: var(--secondary); font-size: 0.8rem; }
+    /* --- Header & Controls --- */
+    .header-controls {
+      background: white;
+      padding: 15px 30px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 50;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+      gap: 16px;
+    }
 
-        .center-controls {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
+    .title-block h1 { margin: 0; font-size: 1.25rem; }
+    .title-block p { margin: 2px 0 0; color: var(--secondary); font-size: 0.8rem; }
 
-        /* Legend */
-        .legend {
-            display: flex;
-            gap: 15px;
-            font-size: 0.75rem;
-            color: var(--secondary);
-            border-right: 1px solid var(--border);
-            padding-right: 20px;
-        }
-        .legend-item { display: flex; align-items: center; gap: 6px; }
-        .dot { width: 8px; height: 8px; border-radius: 50%; }
-        .dot.gen { background: var(--gen-color); }
-        .dot.lead { background: var(--leader-color); }
-        .dot.doc { background: var(--doc-color); }
+    .btn-group {
+      display: flex;
+      gap: 8px;
+      background: #f1f5f9;
+      padding: 4px;
+      border-radius: 8px;
+    }
 
-        .btn-group {
-            display: flex;
-            gap: 8px;
-            background: #f1f5f9;
-            padding: 4px;
-            border-radius: 8px;
-        }
+    button {
+      padding: 8px 16px;
+      border: 1px solid transparent;
+      background: transparent;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--secondary);
+      transition: all 0.2s;
+    }
 
-        button {
-            padding: 8px 16px;
-            border: 1px solid transparent;
-            background: transparent;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: var(--secondary);
-            transition: all 0.2s;
-        }
+    button:hover { background: rgba(255,255,255,0.5); }
 
-        button:hover { background: rgba(255,255,255,0.5); }
+    button.active {
+      background: white;
+      color: var(--primary);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
 
-        button.active {
-            background: white;
-            color: var(--primary);
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
+    /* --- Main Scrollable Area --- */
+    .diagram-wrapper {
+      flex: 1;
+      overflow: auto;
+      position: relative;
+      background: var(--bg);
+    }
 
-        /* --- Main Scrollable Area --- */
-        .diagram-wrapper {
-            flex: 1;
-            overflow: auto; /* Allow scrolling */
-            position: relative;
-            background: var(--bg);
-        }
+    /* --- The Grid System --- */
+    .grid-container {
+      display: flex;
+      min-width: 1600px;
+      min-height: 100%;
+      position: relative;
+    }
 
-        /* --- The Grid System --- */
-        .grid-container {
-            display: flex;
-            min-width: 1600px; /* Ensure horizontal scroll */
-            min-height: 100%;
-            position: relative;
-            padding-bottom: 80px; /* Space for checkpoints */
-        }
+    .time-column {
+      flex: 1;
+      min-width: 200px;
+      border-right: 1px dashed var(--border);
+      display: flex;
+      flex-direction: column;
+      padding: 60px 20px 110px 20px; /* bottom leaves room for checkpoints */
+      gap: 26px; /* slightly tighter */
+      position: relative;
+    }
 
-        /* Time Columns */
-        .time-column {
-            flex: 1;
-            min-width: 200px;
-            border-right: 1px dashed var(--border);
-            display: flex;
-            flex-direction: column;
-            padding: 70px 20px 20px 20px; 
-            gap: 40px; 
-            position: relative;
-        }
+    .time-column:nth-child(even) { background-color: var(--column-even); }
+    .time-column:nth-child(odd) { background-color: var(--column-odd); }
 
-        .time-column:nth-child(even) { background-color: var(--column-even); }
-        .time-column:nth-child(odd) { background-color: var(--column-odd); }
+    .col-header {
+      position: absolute;
+      top: 0; left: 0; width: 100%;
+      text-align: center;
+      padding: 15px 0;
+      font-weight: 700;
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      color: var(--secondary);
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+      background: inherit;
+      z-index: 5;
+    }
 
-        .col-header {
-            position: absolute;
-            top: 0; left: 0; width: 100%;
-            text-align: center;
-            padding: 20px 0;
-            font-weight: 800; /* BOLD headers */
-            text-transform: uppercase;
-            font-size: 0.9rem; /* Larger headers */
-            color: #334155;
-            border-bottom: 1px solid rgba(0,0,0,0.05);
-            background: inherit;
-            z-index: 5;
-        }
+    /* --- Cards --- */
+    .node-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+      transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      cursor: pointer;
+      position: relative;
+      z-index: 10;
+    }
 
-        /* --- Cards --- */
-        .node-card {
-            background: white;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 15px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            cursor: pointer;
-            position: relative;
-            z-index: 10;
-        }
+    .node-card:hover {
+      transform: translateY(-3px) scale(1.01);
+      box-shadow: 0 12px 20px -5px rgba(0, 0, 0, 0.1);
+      border-color: var(--primary);
+    }
 
-        .node-card:hover {
-            transform: translateY(-4px) scale(1.02);
-            box-shadow: 0 12px 20px -5px rgba(0, 0, 0, 0.1);
-            border-color: var(--primary);
-        }
+    .node-card.leader { border-left: 4px solid var(--leader-color); }
+    .node-card.general { border-left: 4px solid var(--gen-color); }
+    .node-card.docs { border-left: 4px solid var(--doc-color); }
 
-        .node-card.leader { border-left: 4px solid var(--leader-color); }
-        .node-card.general { border-left: 4px solid var(--gen-color); }
-        .node-card.docs { border-left: 4px solid var(--doc-color); }
+    .node-title { font-weight: 700; font-size: 0.9rem; margin-bottom: 5px; }
+    .node-meta { font-size: 0.75rem; color: var(--secondary); line-height: 1.4; }
 
-        .node-title { font-weight: 700; font-size: 0.9rem; margin-bottom: 5px; }
-        .node-meta { font-size: 0.75rem; color: var(--secondary); line-height: 1.4; }
+    .stack-badge {
+      background: #fef2f2; color: #dc2626;
+      padding: 2px 6px; border-radius: 4px;
+      font-size: 0.65rem; display: inline-block;
+      margin-top: 8px; font-weight: 700;
+    }
 
-        .stack-badge {
-            background: #fef2f2; color: #dc2626;
-            padding: 2px 6px; border-radius: 4px;
-            font-size: 0.65rem; display: inline-block;
-            margin-top: 8px; font-weight: 700;
-        }
+    /* --- SVG Layer --- */
+    #svg-layer {
+      position: absolute;
+      top: 0; left: 0;
+      pointer-events: none;
+      z-index: 8;
+    }
 
-        /* --- SVG Layer --- */
-        #svg-layer {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            pointer-events: none;
-            z-index: 8;
-        }
+    /* --- Popover (with bounded content) --- */
+    .popover {
+      position: absolute;
+      background: white;
+      width: 300px; /* slightly wider */
+      padding: 18px;
+      border-radius: 12px;
+      box-shadow: 0 10px 40px -10px rgba(0,0,0,0.2);
+      border: 1px solid var(--border);
+      z-index: 100;
 
-        /* --- Smart Pop-up --- */
-        .popover {
-            position: absolute;
-            background: white;
-            width: 280px;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 20px 50px -10px rgba(0,0,0,0.25);
-            border: 1px solid var(--border);
-            z-index: 200;
-            
-            /* Hidden State */
-            opacity: 0;
-            transform: translateY(10px) scale(0.95);
-            pointer-events: none;
-            transition: opacity 0.15s, transform 0.15s;
-        }
+      opacity: 0;
+      transform: translateY(10px) scale(0.96);
+      pointer-events: none;
+      transition: opacity 0.18s, transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
 
-        .popover.active {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-            pointer-events: auto;
-        }
+    .popover.active {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      pointer-events: auto;
+    }
 
-        /* Arrow (Default: Left side of popover) */
-        .popover::after {
-            content: '';
-            position: absolute;
-            top: 20px;
-            left: -8px;
-            width: 16px;
-            height: 16px;
-            background: white;
-            border-left: 1px solid var(--border);
-            border-bottom: 1px solid var(--border);
-            transform: rotate(45deg);
-        }
+    /* pointer (default = left side) */
+    .popover::after {
+      content: '';
+      position: absolute;
+      top: 22px;
+      left: -8px;
+      width: 16px;
+      height: 16px;
+      background: white;
+      border-left: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      transform: rotate(45deg);
+    }
 
-        /* Arrow Flip (Right side of popover) */
-        .popover.flip-left::after {
-            left: auto;
-            right: -8px;
-            border-left: none;
-            border-bottom: none;
-            border-top: 1px solid var(--border);
-            border-right: 1px solid var(--border);
-        }
+    /* pointer flip when popover is on the left side of card */
+    .popover.flip::after {
+      left: auto;
+      right: -8px;
+      border-left: none;
+      border-bottom: none;
+      border-right: 1px solid var(--border);
+      border-top: 1px solid var(--border);
+      transform: rotate(45deg);
+    }
 
-        .popover h4 { margin: 0 0 10px 0; color: var(--primary); font-size: 1rem; }
-        .popover-content { font-size: 0.85rem; color: #334155; line-height: 1.5; }
-        .popover-meta { margin-top: 15px; padding-top: 10px; border-top: 1px solid #f1f5f9; font-size: 0.75rem; color: #94a3b8; font-weight: 600; }
-        
-        /* Close button inside popover (mobile friendly) */
-        .pop-close {
-            position: absolute; top: 10px; right: 10px;
-            background: none; border: none; font-size: 1.2rem;
-            color: var(--secondary); cursor: pointer;
-        }
+    .popover h4 { margin: 0 0 10px 0; color: var(--primary); font-size: 0.95rem; }
+    .popover-content {
+      font-size: 0.8rem; color: #334155; line-height: 1.5;
 
-        /* --- Checkpoints Footer --- */
-        .checkpoints-bar {
-            position: fixed; /* Fix to viewport bottom */
-            bottom: 0; left: 0; width: 100%;
-            height: 70px;
-            display: flex;
-            background: white;
-            border-top: 2px solid var(--primary); /* Stronger border */
-            box-shadow: 0 -4px 20px rgba(0,0,0,0.05);
-            z-index: 100;
-            align-items: center;
-        }
+      /* KEY: prevent overflow */
+      max-height: 220px;
+      overflow: auto;
+      padding-right: 6px;
+    }
+    .popover-meta { margin-top: 12px; padding-top: 10px; border-top: 1px solid #f1f5f9; font-size: 0.75rem; color: #94a3b8; font-weight: 600; }
 
-        .check-label {
-            width: 150px;
-            padding-left: 30px;
-            font-weight: 800;
-            color: var(--primary);
-            text-transform: uppercase;
-            font-size: 0.8rem;
-            flex-shrink: 0;
-            background: white;
-            z-index: 101;
-        }
+    /* --- Click-outside overlay (only when popover is open) --- */
+    .dismiss-overlay{
+      position:absolute;
+      inset:0;
+      background:transparent;
+      display:none;
+      z-index:95; /* below popover (100), above cards (10) */
+    }
+    .dismiss-overlay.active{ display:block; }
 
-        .check-scroll-container {
-            display: flex;
-            flex: 1;
-            /* Sync scrolling with main diagram manually or via overflow hidden */
-            overflow: hidden; 
-            height: 100%;
-        }
+    /* --- Checkpoints Footer --- */
+    .checkpoints-bar {
+      position: sticky; /* sticks to bottom of scroll viewport */
+      bottom: 0;
+      left: 0;
+      display: flex;
+      width: 100%;
+      border-top: 2px solid #e2e8f0;
+      background: rgba(255,255,255,0.86);
+      backdrop-filter: blur(6px);
+      z-index: 20;
+    }
 
-        .check-col {
-            flex: 1; /* Match time columns width ratio */
-            min-width: 200px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            font-size: 0.75rem;
-            color: var(--secondary);
-            border-right: 1px dashed var(--border);
-            background: #f8fafc;
-        }
+    .check-col {
+      flex: 1;
+      min-width: 200px; /* match columns */
+      text-align: center;
+      padding: 14px 6px;
+      font-size: 0.7rem;
+      color: var(--secondary);
+      position: relative;
+      border-right: 1px dashed rgba(203,213,225,.7);
+    }
 
-        .check-dot {
-            width: 12px; height: 12px;
-            background: var(--gen-color);
-            border-radius: 50%;
-            margin-bottom: 5px;
-            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
-        }
+    .check-col:last-child{ border-right:none; }
 
-    </style>
+    .check-dot {
+      width: 10px; height: 10px;
+      background: white;
+      border: 2px solid var(--gen-color);
+      border-radius: 50%;
+      margin: 0 auto 6px auto;
+      position: absolute;
+      top: -6px; left: 50%; transform: translateX(-50%);
+    }
+
+    .check-label{
+      font-weight:700;
+      letter-spacing:.4px;
+      text-transform: uppercase;
+      font-size: .62rem;
+      color:#64748b;
+    }
+
+  </style>
 </head>
 <body>
 
-    <div class="header-controls">
-        <div class="title-block">
-            <h1>HD Onboarding Map</h1>
-            <p>Interactive Workflow</p>
-        </div>
-        
-        <div class="center-controls">
-            <div class="legend">
-                <div class="legend-item"><div class="dot gen"></div> General</div>
-                <div class="legend-item"><div class="dot lead"></div> Leader</div>
-                <div class="legend-item"><div class="dot doc"></div> Docs</div>
-            </div>
-
-            <div class="btn-group">
-                <button onclick="setPersona('general')" id="btn-gen">General</button>
-                <button onclick="setPersona('new_leader')" id="btn-new" class="active">New Leader</button>
-                <button onclick="setPersona('promo_leader')" id="btn-promo">Promoted</button>
-            </div>
-        </div>
+  <div class="header-controls">
+    <div class="title-block">
+      <h1>HD Onboarding Process</h1>
+      <p>Interactive Workflow • Click cards for details</p>
     </div>
-
-    <div class="diagram-wrapper" id="scroll-area">
-        <div class="grid-container" id="main-grid">
-            </div>
-        <svg id="svg-layer"></svg>
-
-        <div class="popover" id="detail-popover">
-            <button class="pop-close" onclick="hidePopover()">×</button>
-            <h4 id="pop-title">Title</h4>
-            <div class="popover-content" id="pop-desc">Description here.</div>
-            <div class="popover-meta" id="pop-owner">OWNER: HR</div>
-        </div>
+    <div class="btn-group">
+      <button onclick="setPersona('general')" id="btn-gen">General Employee</button>
+      <button onclick="setPersona('new_leader')" id="btn-new" class="active">New Leader</button>
+      <button onclick="setPersona('promo_leader')" id="btn-promo">Promoted Leader</button>
     </div>
+  </div>
 
-    <div class="checkpoints-bar">
-        <div class="check-label">CHECKPOINTS</div>
-        <div class="check-scroll-container" id="checkpoints-inner">
-            </div>
+  <div class="diagram-wrapper" id="scroll-area">
+    <!-- Click-catcher for outside click close -->
+    <div class="dismiss-overlay" id="dismiss"></div>
+
+    <div class="grid-container" id="main-grid"></div>
+
+    <svg id="svg-layer"></svg>
+
+    <div class="checkpoints-bar" id="checkpoints"></div>
+
+    <div class="popover" id="detail-popover">
+      <h4 id="pop-title">Title</h4>
+      <div class="popover-content" id="pop-desc">Description here.</div>
+      <div class="popover-meta" id="pop-owner">OWNER: HR</div>
     </div>
+  </div>
 
-    <script>
-        // --- DATA ---
-        const phases = [
-            "Trigger", "Day 1", "Week 1", "Week 2", 
-            "30 Days", "45 Days", "60 Days", "90 Days"
-        ];
+  <script>
+    const phases = ["Trigger","Day 1","Week 1","Week 2","30 Days","45 Days","60 Days","90 Days"];
 
-        const steps = [
-            { id: 'trig', title: "Offer Accepted", desc: "Process Trigger", phase: 0, type: 'general', roles: ['all'], 
-              context: "Candidate accepts offer in the portal. Integration triggers HRIS profile creation.", connectTo: ['doc_req', 'welc'] },
-            { id: 'doc_req', title: "Request Docs", desc: "Automated Checklist", phase: 0, type: 'docs', roles: ['all'], 
-              context: "System sends email requesting ID, Tax forms, and Bank details.", connectTo: ['sign'] },
-            { id: 'welc', title: "General Welcome", desc: "Day 1 Logistics", phase: 1, type: 'general', roles: ['all'], 
-              context: "Reception greeting. Badge issuance. IT Hardware handoff.", connectTo: ['train'] },
-            { id: 'sign', title: "Sign Contract", desc: "Legal & Compliance", phase: 1, type: 'docs', roles: ['all'], 
-              context: "Physical or digital signature of the official employment contract.", connectTo: [] },
-            { id: 'comm_gen', title: "Entry Announcement", desc: "Team Email", phase: 1, type: 'general', roles: ['general'], 
-              context: "Standard 'New Joiner' email sent to immediate department.", connectTo: ['train'] },
-            { id: 'comm_lead', title: "Entry Announcement", desc: "Org-wide Email", phase: 1, type: 'leader', roles: ['new_leader'], 
-              context: "VP/HR sends welcome email to the wider organization introducing the new leader.", connectTo: ['go_day'] },
-            { id: 'comm_promo', title: "Promotion Comms", desc: "Internal Announcement", phase: 1, type: 'leader', roles: ['promo_leader'], 
-              context: "Official communication regarding the internal promotion.", connectTo: ['go_day'] },
-            { id: 'train', title: "Core Training", desc: "LMS Modules", phase: 2, type: 'general', roles: ['all'], 
-              context: "Mandatory: Code of Conduct, Data Privacy, Safety.", connectTo: ['intro'] },
-            { id: 'intro', title: "Team Intros", desc: "Meet & Greets", phase: 3, type: 'general', roles: ['all'], 
-              context: "Scheduled 1:1s with direct reports and peers.", connectTo: [] },
-            { id: 'go_day', title: "Go Day Plan", desc: "30-Day Strategy", phase: 4, type: 'leader', roles: ['new_leader', 'promo_leader'], 
-              context: "<b>Leader Requirement:</b> Create a structured focus plan. Review draft with Manager by Day 30.", connectTo: ['rev_60'] },
-            { id: 'rev_30', title: "30-Day Check", desc: "HR Touchpoint", phase: 4, type: 'general', roles: ['general'], 
-              context: "Casual check-in: 'Do you have the tools you need?'", connectTo: [] },
-            { id: 'rev_60', title: "60-Day Progress", desc: "Plan Review", phase: 6, type: 'leader', roles: ['new_leader', 'promo_leader'], 
-              context: "Review execution of the Go Day Plan. Adjust MBOs if necessary.", connectTo: ['final_90'] },
-            { id: 'final_90', title: "90-Day Deliverables", desc: "MBOs & SWOT", phase: 7, type: 'leader', roles: ['new_leader', 'promo_leader'], 
-              context: "<b>Submission:</b> Full Action Plan, Final MBOs, SWOT Analysis, and Team Diagnostic.", connectTo: [] },
-            { id: 'probation', title: "Probation Review", desc: "Employment Confirm", phase: 7, type: 'general', roles: ['general'], 
-              context: "Formal performance review to confirm permanent status.", connectTo: [] }
-        ];
+    const steps = [
+      { id:'trig', title:"Offer Accepted", desc:"Process Trigger", phase:0, type:'general', roles:['all'],
+        context:"Candidate accepts offer in the portal. Integration triggers HRIS profile creation.",
+        connectTo:['doc_req','welc'] },
 
-        let currentRole = 'new_leader';
+      { id:'doc_req', title:"Request Docs", desc:"Automated Checklist", phase:0, type:'docs', roles:['all'],
+        context:"System sends email requesting ID, tax forms, and bank details.",
+        connectTo:['sign'] },
 
-        function init() {
-            setPersona('new_leader');
-            
-            // Sync scrolling: Checkpoints bar follows Main Grid
-            const mainArea = document.getElementById('scroll-area');
-            const checkArea = document.getElementById('checkpoints-inner');
-            
-            // Note: Since checkArea is hidden overflow, we transform it
-            mainArea.addEventListener('scroll', () => {
-                checkArea.style.transform = `translateX(-${mainArea.scrollLeft}px)`;
-            });
+      { id:'welc', title:"General Welcome", desc:"Day 1 Logistics", phase:1, type:'general', roles:['all'],
+        context:"Reception greeting. Badge issuance. IT hardware handoff.",
+        connectTo:['train'] },
 
-            // Click outside to close
-            mainArea.addEventListener('click', (e) => {
-                // If clicking blank space, close popover
-                if(e.target.id === 'scroll-area' || e.target.id === 'svg-layer' || e.target.classList.contains('time-column')) {
-                    hidePopover();
-                }
-            });
+      { id:'sign', title:"Sign Contract", desc:"Legal & Compliance", phase:1, type:'docs', roles:['all'],
+        context:"Physical or digital signature of the official employment contract.",
+        connectTo:[] },
 
-            // Redraw lines on resize
-            window.addEventListener('resize', () => {
-                clearTimeout(window.resizeTimer);
-                window.resizeTimer = setTimeout(() => drawLines(), 100);
-            });
+      { id:'comm_gen', title:"Entry Announcement", desc:"Team Email", phase:1, type:'general', roles:['general'],
+        context:"Standard 'New Joiner' email sent to immediate department.",
+        connectTo:['train'] },
+
+      { id:'comm_lead', title:"Entry Announcement", desc:"Org-wide Email", phase:1, type:'leader', roles:['new_leader'],
+        context:"VP/HR sends a welcome email to the wider organization introducing the new leader.",
+        connectTo:['go_day'] },
+
+      { id:'comm_promo', title:"Promotion Comms", desc:"Internal Announcement", phase:1, type:'leader', roles:['promo_leader'],
+        context:"Official communication regarding the internal promotion.",
+        connectTo:['go_day'] },
+
+      { id:'train', title:"Core Training", desc:"LMS Modules", phase:2, type:'general', roles:['all'],
+        context:"Mandatory: Code of Conduct, Data Privacy, Safety.",
+        connectTo:['intro'] },
+
+      { id:'intro', title:"Team Intros", desc:"Meet & Greets", phase:3, type:'general', roles:['all'],
+        context:"Scheduled 1:1s with direct reports and peers.",
+        connectTo:[] },
+
+      { id:'go_day', title:"Go Day Plan", desc:"30-Day Strategy", phase:4, type:'leader', roles:['new_leader','promo_leader'],
+        context:"<b>Leader Requirement:</b> Create a structured focus plan. Review draft with manager by Day 30.",
+        connectTo:['rev_60'] },
+
+      { id:'rev_30', title:"30-Day Check", desc:"HR Touchpoint", phase:4, type:'general', roles:['general'],
+        context:"Casual check-in: confirm tools access and early integration.",
+        connectTo:[] },
+
+      { id:'rev_60', title:"60-Day Progress", desc:"Plan Review", phase:6, type:'leader', roles:['new_leader','promo_leader'],
+        context:"Review execution of the Go Day Plan. Adjust priorities / MBOs if necessary.",
+        connectTo:['final_90'] },
+
+      { id:'final_90', title:"90-Day Deliverables", desc:"MBOs & SWOT", phase:7, type:'leader', roles:['new_leader','promo_leader'],
+        context:"<b>Submission:</b> Full Action Plan, final MBOs, SWOT analysis, and team diagnostic.",
+        connectTo:[] },
+
+      { id:'probation', title:"Probation Review", desc:"Employment Confirm", phase:7, type:'general', roles:['general'],
+        context:"Formal performance review to confirm permanent status.",
+        connectTo:[] }
+    ];
+
+    let currentRole = 'new_leader';
+
+    function init(){
+      setPersona('new_leader');
+
+      // Close on outside click via overlay
+      document.getElementById('dismiss').addEventListener('click', hidePopover);
+
+      // Keep lines aligned while scrolling
+      document.getElementById('scroll-area').addEventListener('scroll', () => {
+        drawLines();
+        // If popover is open, reposition to avoid “lag”
+        if (document.getElementById('detail-popover').classList.contains('active') && window._lastPopover) {
+          showPopover(window._lastPopover.data, window._lastPopover.el, true);
         }
+      }, { passive: true });
 
-        function setPersona(role) {
-            currentRole = role;
-            document.querySelectorAll('.btn-group button').forEach(b => b.classList.remove('active'));
-            if(role === 'general') document.getElementById('btn-gen').classList.add('active');
-            if(role === 'new_leader') document.getElementById('btn-new').classList.add('active');
-            if(role === 'promo_leader') document.getElementById('btn-promo').classList.add('active');
-            
-            hidePopover();
-            render();
-        }
+      window.addEventListener('resize', () => {
+        clearTimeout(window.resizeTimer);
+        window.resizeTimer = setTimeout(() => {
+          drawLines();
+          if (document.getElementById('detail-popover').classList.contains('active') && window._lastPopover) {
+            showPopover(window._lastPopover.data, window._lastPopover.el, true);
+          }
+        }, 120);
+      });
 
-        function render() {
-            const grid = document.getElementById('main-grid');
-            const checkInner = document.getElementById('checkpoints-inner');
-            grid.innerHTML = '';
-            checkInner.innerHTML = '';
+      // Esc closes
+      document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') hidePopover(); });
+    }
 
-            // 1. Create Columns
-            const colElements = [];
-            phases.forEach(phaseName => {
-                // Main Column
-                const col = document.createElement('div');
-                col.className = 'time-column';
-                col.innerHTML = `<div class="col-header">${phaseName}</div>`;
-                grid.appendChild(col);
-                colElements.push(col);
+    function setPersona(role){
+      currentRole = role;
 
-                // Checkpoint Column
-                const checkCol = document.createElement('div');
-                checkCol.className = 'check-col';
-                checkCol.innerHTML = `<div class="check-dot"></div>${phaseName === 'Trigger' ? 'Trigger' : 'Check'}`;
-                checkInner.appendChild(checkCol);
-            });
+      document.querySelectorAll('.btn-group button').forEach(b => b.classList.remove('active'));
+      if(role === 'general') document.getElementById('btn-gen').classList.add('active');
+      if(role === 'new_leader') document.getElementById('btn-new').classList.add('active');
+      if(role === 'promo_leader') document.getElementById('btn-promo').classList.add('active');
 
-            // 2. Filter & Place Cards
-            const visibleSteps = steps.filter(s => s.roles.includes('all') || s.roles.includes(currentRole));
-            
-            visibleSteps.forEach(step => {
-                const card = document.createElement('div');
-                card.className = `node-card ${step.type}`;
-                card.id = `card-${step.id}`;
-                card.innerHTML = `
-                    <div class="node-title">${step.title}</div>
-                    <div class="node-meta">${step.desc}</div>
-                    ${step.type === 'leader' ? '<span class="stack-badge">Leader Task</span>' : ''}
-                `;
-                
-                card.onclick = (e) => {
-                    e.stopPropagation();
-                    showPopover(step, card);
-                };
+      hidePopover();
+      render();
+    }
 
-                if(colElements[step.phase]) {
-                    colElements[step.phase].appendChild(card);
-                }
-            });
+    function render(){
+      const grid = document.getElementById('main-grid');
+      const checks = document.getElementById('checkpoints');
+      grid.innerHTML = '';
+      checks.innerHTML = '';
 
-            setTimeout(() => drawLines(visibleSteps), 50);
-        }
+      const colElements = [];
+      phases.forEach((phaseName, idx) => {
+        const col = document.createElement('div');
+        col.className = 'time-column';
+        col.innerHTML = `<div class="col-header">${phaseName}</div>`;
+        grid.appendChild(col);
+        colElements.push(col);
 
-        // --- SMART POPOVER ---
-        function showPopover(data, cardEl) {
-            const pop = document.getElementById('detail-popover');
-            const wrapper = document.getElementById('scroll-area');
-            const cardRect = cardEl.getBoundingClientRect();
-            const wrapperRect = wrapper.getBoundingClientRect();
-            const containerWidth = wrapper.clientWidth;
+        // checkpoints footer cells (match columns)
+        const checkCol = document.createElement('div');
+        checkCol.className = 'check-col';
+        checkCol.innerHTML = `
+          <div class="check-dot"></div>
+          <div class="check-label">${phaseName}</div>
+          <div>${idx === 0 ? 'Trigger' : 'Checkpoint'}</div>
+        `;
+        checks.appendChild(checkCol);
+      });
 
-            // Populate
-            document.getElementById('pop-title').innerText = data.title;
-            document.getElementById('pop-desc').innerHTML = data.context;
-            document.getElementById('pop-owner').innerText = "OWNER: " + data.type.toUpperCase();
+      const visibleSteps = steps.filter(s => s.roles.includes('all') || s.roles.includes(currentRole));
 
-            // Default: Position to the RIGHT
-            // Relative to scroll area:
-            // Left = (Card Right Edge) - (Wrapper Left Edge) + offset
-            let leftPos = (cardRect.right - wrapperRect.left) + 20; 
-            let topPos = (cardRect.top - wrapperRect.top) - 10;
-            
-            // Check overflow
-            const popWidth = 280; 
-            const isOverflow = (cardRect.right + popWidth + 40) > containerWidth;
+      visibleSteps.forEach(step => {
+        const card = document.createElement('div');
+        card.className = `node-card ${step.type}`;
+        card.id = `card-${step.id}`;
+        card.innerHTML = `
+          <div class="node-title">${step.title}</div>
+          <div class="node-meta">${step.desc}</div>
+          ${step.type === 'leader' ? '<span class="stack-badge">Leader Task</span>' : ''}
+        `;
 
-            // Reset classes
-            pop.classList.remove('flip-left');
+        card.addEventListener('click', (e) => {
+          e.stopPropagation();
+          showPopover(step, card);
+        });
 
-            if(isOverflow) {
-                // FLIP TO LEFT
-                leftPos = (cardRect.left - wrapperRect.left) - popWidth - 20;
-                pop.classList.add('flip-left');
-            }
+        colElements[step.phase]?.appendChild(card);
+      });
 
-            pop.style.top = topPos + 'px';
-            pop.style.left = leftPos + 'px';
-            pop.classList.add('active');
-        }
+      // After layout
+      requestAnimationFrame(() => {
+        sizeSvgToCanvas();
+        drawLines(visibleSteps);
+      });
+    }
 
-        function hidePopover() {
-            document.getElementById('detail-popover').classList.remove('active');
-        }
+    function sizeSvgToCanvas(){
+      const svg = document.getElementById('svg-layer');
+      const grid = document.getElementById('main-grid');
 
-        // --- LINE DRAWING (ORTHOGONAL) ---
-        function drawLines(visibleSteps) {
-            const svg = document.getElementById('svg-layer');
-            svg.innerHTML = `
-                <defs>
-                    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
-                        <path d="M0,0 L0,6 L9,3 z" fill="#94a3b8" />
-                    </marker>
-                </defs>
-            `;
+      svg.setAttribute('width', grid.scrollWidth);
+      svg.setAttribute('height', grid.scrollHeight);
+      svg.style.width = grid.scrollWidth + 'px';
+      svg.style.height = grid.scrollHeight + 'px';
+    }
 
-            if(!visibleSteps) visibleSteps = steps.filter(s => s.roles.includes('all') || s.roles.includes(currentRole));
+    function drawLines(visibleSteps){
+      const svg = document.getElementById('svg-layer');
+      const wrapper = document.getElementById('scroll-area');
+      const grid = document.getElementById('main-grid');
 
-            visibleSteps.forEach(source => {
-                source.connectTo.forEach(targetId => {
-                    if(!visibleSteps.find(s => s.id === targetId)) return;
+      // Ensure sizing stays correct (in case content changed)
+      sizeSvgToCanvas();
 
-                    const startEl = document.getElementById(`card-${source.id}`);
-                    const endEl = document.getElementById(`card-${targetId}`);
-                    
-                    if(startEl && endEl) {
-                        drawPolyline(svg, startEl, endEl);
-                    }
-                });
-            });
-        }
+      svg.innerHTML = `
+        <defs>
+          <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+            <path d="M0,0 L0,6 L9,3 z" fill="${getComputedStyle(document.documentElement).getPropertyValue('--arrow').trim() || '#94a3b8'}" />
+          </marker>
+        </defs>
+      `;
 
-        function drawPolyline(svg, startEl, endEl) {
-            const svgRect = svg.getBoundingClientRect();
-            const sRect = startEl.getBoundingClientRect();
-            const eRect = endEl.getBoundingClientRect();
+      if(!visibleSteps) visibleSteps = steps.filter(s => s.roles.includes('all') || s.roles.includes(currentRole));
 
-            const x1 = sRect.right - svgRect.left;
-            const y1 = sRect.top + sRect.height/2 - svgRect.top;
-            const x2 = eRect.left - svgRect.left;
-            const y2 = eRect.top + eRect.height/2 - svgRect.top;
+      visibleSteps.forEach(source => {
+        source.connectTo.forEach(targetId => {
+          if(!visibleSteps.find(s => s.id === targetId)) return;
 
-            const midX = x1 + (x2 - x1) / 2;
-            const points = `${x1},${y1} ${midX},${y1} ${midX},${y2} ${x2},${y2}`;
+          const startEl = document.getElementById(`card-${source.id}`);
+          const endEl = document.getElementById(`card-${targetId}`);
+          if(startEl && endEl) drawPolyline(svg, wrapper, startEl, endEl);
+        });
+      });
+    }
 
-            const polyline = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
-            polyline.setAttribute("points", points);
-            polyline.setAttribute("fill", "none");
-            polyline.setAttribute("stroke", "#cbd5e1");
-            polyline.setAttribute("stroke-width", "2");
-            polyline.setAttribute("marker-end", "url(#arrow)");
+    function drawPolyline(svg, wrapper, startEl, endEl){
+      const wRect = wrapper.getBoundingClientRect();
+      const sRect = startEl.getBoundingClientRect();
+      const eRect = endEl.getBoundingClientRect();
 
-            svg.appendChild(polyline);
-        }
+      // Convert to wrapper scroll-space (so it stays aligned when you scroll)
+      const x1 = (sRect.right - wRect.left) + wrapper.scrollLeft;
+      const y1 = (sRect.top + sRect.height/2 - wRect.top) + wrapper.scrollTop;
 
-        init();
-    </script>
+      const x2 = (eRect.left - wRect.left) + wrapper.scrollLeft;
+      const y2 = (eRect.top + eRect.height/2 - wRect.top) + wrapper.scrollTop;
+
+      const midX = x1 + (x2 - x1) / 2;
+
+      const points = `${x1},${y1} ${midX},${y1} ${midX},${y2} ${x2},${y2}`;
+
+      const polyline = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
+      polyline.setAttribute("points", points);
+      polyline.setAttribute("fill", "none");
+      polyline.setAttribute("stroke", getComputedStyle(document.documentElement).getPropertyValue('--line').trim() || "#cbd5e1");
+      polyline.setAttribute("stroke-width", "1.6");
+      polyline.setAttribute("marker-end", "url(#arrow)");
+
+      svg.appendChild(polyline);
+    }
+
+    function showPopover(data, cardEl, isRepositionOnly=false){
+      const pop = document.getElementById('detail-popover');
+      const wrapper = document.getElementById('scroll-area');
+
+      // Save for scroll reposition
+      window._lastPopover = { data, el: cardEl };
+
+      if(!isRepositionOnly){
+        document.getElementById('pop-title').innerText = data.title;
+        document.getElementById('pop-desc').innerHTML = data.context;
+        document.getElementById('pop-owner').innerText = "OWNER: " + data.type.toUpperCase();
+      }
+
+      const cardRect = cardEl.getBoundingClientRect();
+      const wrapperRect = wrapper.getBoundingClientRect();
+
+      // Default position: right side
+      const gap = 18;
+      let left = (cardRect.right - wrapperRect.left) + wrapper.scrollLeft + gap;
+      let top  = (cardRect.top - wrapperRect.top) + wrapper.scrollTop - 10;
+
+      // Popover bounds (within scroll area viewport)
+      pop.classList.add('active'); // temporarily show to measure
+      const popW = pop.offsetWidth;
+      const popH = pop.offsetHeight;
+
+      // Clamp vertically: keep within viewport (not whole page)
+      const viewTop = wrapper.scrollTop + 12;
+      const viewBot = wrapper.scrollTop + wrapper.clientHeight - popH - 12;
+      top = Math.max(viewTop, Math.min(top, viewBot));
+
+      // If it would go off right edge, flip to left side
+      const viewRight = wrapper.scrollLeft + wrapper.clientWidth - 12;
+      if(left + popW > viewRight){
+        left = (cardRect.left - wrapperRect.left) + wrapper.scrollLeft - popW - gap;
+        pop.classList.add('flip');
+      } else {
+        pop.classList.remove('flip');
+      }
+
+      // Also clamp horizontally so it never disappears
+      const viewLeft = wrapper.scrollLeft + 12;
+      left = Math.max(viewLeft, Math.min(left, viewRight - popW));
+
+      pop.style.left = left + 'px';
+      pop.style.top  = top  + 'px';
+
+      // Enable outside click overlay
+      document.getElementById('dismiss').classList.add('active');
+    }
+
+    function hidePopover(){
+      const pop = document.getElementById('detail-popover');
+      pop.classList.remove('active');
+      pop.classList.remove('flip');
+      document.getElementById('dismiss').classList.remove('active');
+      window._lastPopover = null;
+    }
+
+    init();
+  </script>
 </body>
 </html>
