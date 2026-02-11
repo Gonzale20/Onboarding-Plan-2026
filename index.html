@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HD Onboarding Dashboard</title>
+  <title>HD Learn Dashboard</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -11,7 +11,7 @@
       --sidebar-bg: #0f172a;
       --sidebar-text: #94a3b8;
       --sidebar-active: #ffffff;
-      --bg: #f1f5f9; /* Light gray app background */
+      --bg: #f1f5f9;
       --surface: #ffffff;
       
       --primary: #2563eb;
@@ -29,7 +29,7 @@
       background-color: var(--bg);
       height: 100vh;
       display: flex;
-      overflow: hidden; /* App-like structure */
+      overflow: hidden;
     }
 
     /* --- 1. SIDEBAR --- */
@@ -51,7 +51,12 @@
       gap: 12px;
     }
 
-    .brand-logo { height: 32px; width: auto; }
+    /* Updated Logo Style */
+    .brand-logo { 
+        height: 40px; /* Slightly larger for readability */
+        width: auto; 
+        object-fit: contain;
+    }
     .brand-text { color: white; font-weight: 700; font-size: 1.1rem; letter-spacing: -0.5px; }
 
     .nav-menu { padding: 24px 16px; flex: 1; }
@@ -138,8 +143,8 @@
     /* Timeline Wrapper */
     .dashboard-view {
       flex: 1;
-      overflow: auto; /* Scroll happens here */
-      padding: 0 32px 32px 32px; /* Margins around the chart */
+      overflow: auto;
+      padding: 0 32px 32px 32px;
       position: relative;
     }
 
@@ -147,10 +152,10 @@
       background: white;
       border: 1px solid var(--border);
       border-radius: 16px;
-      min-width: 1600px; /* Force scroll */
+      min-width: 1600px;
       min-height: 100%;
       position: relative;
-      overflow: hidden; /* Clip contents */
+      overflow: hidden;
       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
       display: flex;
       flex-direction: column;
@@ -162,7 +167,7 @@
       position: relative;
     }
 
-    /* Columns & Cards (Reused styles, refined) */
+    /* Columns & Cards */
     .time-column {
       flex: 1;
       border-right: 1px dashed var(--border);
@@ -189,7 +194,7 @@
     .node-title { font-weight: 700; font-size: 0.9rem; color: #1e293b; margin-bottom: 4px; }
     .node-meta { font-size: 0.75rem; color: #64748b; line-height: 1.4; }
 
-    /* Sticky Checkpoints (Bottom of Chart Surface) */
+    /* Sticky Checkpoints */
     .checkpoints-sticky {
       position: sticky; bottom: 0; left: 0; width: 100%; height: 70px;
       background: white; border-top: 2px solid var(--primary);
@@ -244,7 +249,7 @@
 
   <aside class="sidebar">
     <div class="brand-area">
-      <img src="./Untitled design (8).png" alt="HD Logo" class="brand-logo">
+      <img src="./HD Learn.png" alt="HD Learn Logo" class="brand-logo">
       <div class="brand-text">HD Onboarding</div>
     </div>
 
@@ -399,75 +404,54 @@
       const saved = localStorage.getItem('hd_dash_v1');
       steps = saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(defaultSteps));
       
-      setPersona('new_leader'); // Default view
+      setPersona('new_leader');
       
-      // Events
       document.getElementById('scroller').addEventListener('scroll', drawLines);
       window.addEventListener('resize', () => { setTimeout(drawLines, 100); });
       document.addEventListener('click', (e) => {
-        // Close popover if clicking outside
         if(!e.target.closest('.node-card')) hidePopover();
       });
     }
 
-    // --- LOGIC ---
     function setPersona(role, btnElement) {
       currentRole = role;
-      
-      // Sidebar Active State
       if(btnElement) {
         document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
         btnElement.classList.add('active');
       }
-
-      // Update Header Label
       const labels = { 'new_leader': '/ New Leader', 'promo_leader': '/ Internal Promotion', 'general': '/ General Employee' };
       document.getElementById('view-label').innerText = labels[role];
-
       render();
     }
 
     function render() {
       const grid = document.getElementById('main-grid');
       const checkBar = document.getElementById('check-bar');
-      
-      // Reset
       grid.innerHTML = '';
       while (checkBar.children.length > 1) { checkBar.removeChild(checkBar.lastChild); }
 
-      // Filter Data
       const visibleSteps = steps.filter(s => s.roles.includes('all') || s.roles.includes(currentRole));
       
-      // Update Stats
       document.getElementById('stat-total').innerText = visibleSteps.length;
       document.getElementById('stat-docs').innerText = visibleSteps.filter(s => s.type === 'docs').length;
       document.getElementById('stat-milestones').innerText = visibleSteps.filter(s => s.type === 'leader').length;
 
       const colElements = [];
       
-      // Build Columns
       phases.forEach((phase, idx) => {
-        // Main Grid Column
         const col = document.createElement('div');
         col.className = 'time-column';
         col.innerHTML = `<div class="col-header">${phase}</div>`;
         grid.appendChild(col);
         colElements.push(col);
 
-        // Checkpoint Column
         const checkCol = document.createElement('div');
         checkCol.className = 'check-col';
         checkCol.id = `check-${idx}`;
-        checkCol.innerHTML = `
-          <div class="progress-bar"></div>
-          <div class="progress-fill"></div>
-          <div class="check-dot"></div>
-          <div style="font-size:0.65rem; color:#94a3b8; margin-top:4px;">${idx===0?'Start':'Check'}</div>
-        `;
+        checkCol.innerHTML = `<div class="progress-bar"></div><div class="progress-fill"></div><div class="check-dot"></div><div style="font-size:0.65rem; color:#94a3b8; margin-top:4px;">${idx===0?'Start':'Check'}</div>`;
         checkBar.appendChild(checkCol);
       });
 
-      // Place Cards
       visibleSteps.forEach(step => {
         const card = document.createElement('div');
         card.className = `node-card ${step.type}`;
@@ -486,7 +470,6 @@
       setTimeout(() => drawLines(visibleSteps), 50);
     }
 
-    // --- FEATURES ---
     function updateProgress(phaseIdx) {
       for(let i=0; i<8; i++) {
         const el = document.getElementById(`check-${i}`);
@@ -504,11 +487,9 @@
       document.getElementById('pop-desc').innerHTML = data.context;
       document.getElementById('pop-meta').innerText = "OWNER: " + data.type.toUpperCase();
 
-      // Position logic
       let left = (rect.right - wrapRect.left) + 20;
       let top = (rect.top - wrapRect.top);
       
-      // Flip if too far right
       if(left + 300 > wrapRect.width) {
         left = (rect.left - wrapRect.left) - 320;
       }
@@ -521,39 +502,29 @@
     function hidePopover() { document.getElementById('popover').classList.remove('visible'); }
 
     function drawLines(visibleSteps) {
-      // (Same drawing logic as V7, adapted for new container)
       const svg = document.getElementById('svg-layer');
       const grid = document.getElementById('main-grid');
-      const scroll = document.getElementById('scroller');
-      
       svg.style.width = grid.scrollWidth + 'px';
       svg.style.height = grid.scrollHeight + 'px';
       
       let paths = '';
-      
-      // Re-filter if needed
       if(!visibleSteps) visibleSteps = steps.filter(s => s.roles.includes('all') || s.roles.includes(currentRole));
 
       visibleSteps.forEach(src => {
         if(!src.connectTo) return;
         src.connectTo.forEach(targetId => {
-          // Find target in visible set
           if(!visibleSteps.find(s => s.id === targetId)) return;
-          
           const el1 = document.getElementById(`card-${src.id}`);
           const el2 = document.getElementById(`card-${targetId}`);
           
           if(el1 && el2) {
             const r1 = el1.getBoundingClientRect();
             const r2 = el2.getBoundingClientRect();
-            const cRect = grid.getBoundingClientRect(); // Canvas rect
-
-            // Coords relative to Grid
+            const cRect = grid.getBoundingClientRect();
             const x1 = r1.right - cRect.left;
             const y1 = (r1.top + r1.height/2) - cRect.top;
             const x2 = r2.left - cRect.left;
             const y2 = (r2.top + r2.height/2) - cRect.top;
-            
             const mid = x1 + (x2-x1)/2;
             paths += `<path d="M ${x1} ${y1} L ${mid} ${y1} L ${mid} ${y2} L ${x2} ${y2}" fill="none" stroke="#cbd5e1" stroke-width="2" marker-end="url(#arrow)" />`;
           }
@@ -563,31 +534,22 @@
       svg.innerHTML = `<defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L0,6 L9,3 z" fill="#94a3b8"/></marker></defs>${paths}`;
     }
 
-    // --- MODAL & DATA ---
     function openModal() { document.getElementById('add-modal').classList.add('open'); }
     function closeModal() { document.getElementById('add-modal').classList.remove('open'); }
     
     function saveNewStep() {
       const title = document.getElementById('new-title').value;
       if(!title) return;
-      
       const roleKey = document.getElementById('new-type').value;
       const roles = roleKey === 'new_leader' ? ['new_leader','promo_leader'] : (roleKey === 'general' ? ['general','all'] : ['all']);
       const type = roleKey === 'new_leader' ? 'leader' : (roleKey === 'general' ? 'general' : 'docs');
-      
       let ctx = document.getElementById('new-context').value || "";
       if(!ctx.includes('<ul>')) ctx = `<ul><li>${ctx.replace(/\n/g, '</li><li>')}</li></ul>`;
 
       steps.push({
-        id: 'cust_'+Date.now(),
-        title: title,
-        desc: "Custom Step",
+        id: 'cust_'+Date.now(), title: title, desc: "Custom Step",
         phase: parseInt(document.getElementById('new-phase').value),
-        type: type,
-        roles: roles,
-        context: ctx,
-        connectTo: [],
-        isCustom: true
+        type: type, roles: roles, context: ctx, connectTo: [], isCustom: true
       });
       
       localStorage.setItem('hd_dash_v1', JSON.stringify(steps));
