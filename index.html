@@ -3,397 +3,274 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HD Onboarding - Linear View</title>
+    <title>HD Onboarding Process Map</title>
     <style>
         :root {
             --primary: #2563eb;
             --secondary: #64748b;
-            --bg: #f1f5f9;
+            --bg: #f8fafc;
             --card-bg: #ffffff;
-            --border: #cbd5e1;
-            --leader-color: #dc2626; 
-            --gen-color: #2563eb; 
-            --doc-color: #059669; 
-            --column-even: #f8fafc;
-            --column-odd: #ffffff;
+            --border: #e2e8f0;
+            --leader-color: #ef4444; /* Red for leader tasks */
+            --gen-color: #3b82f6; /* Blue for general tasks */
+            --doc-color: #10b981; /* Green for docs */
         }
 
         body {
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             background-color: var(--bg);
             margin: 0;
-            padding: 0;
+            padding: 20px;
             color: #1e293b;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
         }
 
-        /* Top Bar */
-        .top-bar {
-            background: white;
-            padding: 15px 30px;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            z-index: 100;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        }
-
+        /* Controls */
         .controls {
             display: flex;
             gap: 10px;
+            margin-bottom: 30px;
+            justify-content: center;
+            background: white;
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
         }
 
         button {
-            padding: 8px 16px;
-            border: 1px solid var(--border);
+            padding: 10px 20px;
+            border: 2px solid var(--border);
             background: white;
-            border-radius: 6px;
+            border-radius: 8px;
             cursor: pointer;
             font-weight: 600;
-            color: var(--secondary);
             transition: all 0.2s;
         }
 
-        button:hover { background: #f8fafc; border-color: var(--primary); }
-        
         button.active {
+            border-color: var(--primary);
             background: var(--primary);
             color: white;
-            border-color: var(--primary);
         }
 
-        /* Main Diagram Area */
-        .diagram-wrapper {
-            flex: 1;
-            overflow: auto;
-            position: relative;
-            background: var(--bg);
-        }
-
-        .grid-container {
+        /* Timeline Grid */
+        .timeline-container {
             display: grid;
-            /* 8 Time Columns */
-            grid-template-columns: repeat(8, minmax(200px, 1fr)); 
-            min-width: 1600px; /* Force horizontal scroll */
-            min-height: 100%;
-            position: relative;
+            grid-template-columns: repeat(8, 1fr); /* 8 Time columns */
+            gap: 15px;
+            overflow-x: auto;
+            padding-bottom: 20px;
+            min-width: 1200px;
         }
 
-        /* Column Styles */
-        .time-column {
-            border-right: 1px dashed var(--border);
-            padding: 20px;
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            gap: 40px; /* Space between cards in same column */
-            padding-top: 60px; /* Space for header */
-        }
-
-        .time-column:nth-child(even) { background-color: var(--column-even); }
-        .time-column:nth-child(odd) { background-color: var(--column-odd); }
-
-        .col-header {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            text-align: center;
-            padding: 15px 0;
-            font-weight: bold;
+        .time-header {
+            font-weight: 700;
             text-transform: uppercase;
             font-size: 0.85rem;
             color: var(--secondary);
-            background: rgba(255,255,255,0.9);
-            border-bottom: 1px solid var(--border);
-            z-index: 10;
+            text-align: center;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 10px;
+            margin-bottom: 10px;
+        }
+
+        /* Lanes */
+        .swimlane {
+            grid-column: 1 / -1;
+            display: grid;
+            grid-template-columns: subgrid;
+            margin-bottom: 20px;
+            min-height: 150px;
+            position: relative;
+        }
+
+        .swimlane-label {
+            position: absolute;
+            left: -120px;
+            top: 20px;
+            font-weight: bold;
+            width: 100px;
+            text-align: right;
+            font-size: 0.9rem;
         }
 
         /* Cards */
         .card {
-            background: white;
+            background: var(--card-bg);
             border: 1px solid var(--border);
-            border-radius: 6px;
-            padding: 15px;
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 0.85rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
             position: relative;
-            z-index: 20;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            transition: transform 0.2s;
+            margin-bottom: 10px;
+            border-left: 4px solid var(--secondary);
         }
 
         .card:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-            border-color: var(--primary);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            z-index: 10;
         }
 
-        .card.leader { border-top: 4px solid var(--leader-color); }
-        .card.general { border-top: 4px solid var(--gen-color); }
-        .card.docs { border-top: 4px solid var(--doc-color); }
+        .card.leader { border-left-color: var(--leader-color); }
+        .card.general { border-left-color: var(--gen-color); }
+        .card.docs { border-left-color: var(--doc-color); }
 
-        .card h4 { margin: 0 0 5px 0; font-size: 0.95rem; }
-        .card p { margin: 0; font-size: 0.8rem; color: var(--secondary); }
-
-        /* SVG Overlay for Lines */
-        #svg-layer {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 15; /* Behind cards, above background */
+        .card-title { font-weight: 700; margin-bottom: 4px; }
+        .card-detail { font-size: 0.75rem; color: var(--secondary); line-height: 1.4; }
+        
+        /* Checkpoints Bar */
+        .checkpoint-bar {
+            grid-column: 1 / -1;
+            display: grid;
+            grid-template-columns: subgrid;
+            background: #eef2f6;
+            border-radius: 8px;
+            padding: 10px 0;
+            margin-top: 20px;
         }
 
-        /* Modal Overlay */
-        .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5);
-            display: none;
-            justify-content: center;
+        .check-node {
+            display: flex;
+            flex-direction: column;
             align-items: center;
-            z-index: 200;
+            font-size: 0.75rem;
+            color: var(--secondary);
+            text-align: center;
+            padding: 0 5px;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            background: #cbd5e1;
+            border-radius: 50%;
+            margin-bottom: 5px;
         }
         
-        .modal {
-            background: white;
-            padding: 30px;
-            border-radius: 12px;
-            width: 500px;
-            max-width: 90%;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-        }
+        .active-dot { background: var(--primary); }
 
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 10px;
-        }
-
-        .modal-header h2 { margin: 0; font-size: 1.5rem; }
-        .close-btn { 
-            background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--secondary); 
-        }
-
-        .modal-body h5 { margin: 15px 0 5px 0; color: var(--secondary); text-transform: uppercase; font-size: 0.75rem; }
-        .modal-body p { margin-top: 0; line-height: 1.6; }
+        /* Helpers */
+        .hidden { display: none; }
 
     </style>
 </head>
 <body>
 
-    <div class="top-bar">
-        <h3>HD Onboarding Process</h3>
-        <div class="controls">
-            <button onclick="setPersona('general')" id="btn-gen">General Employee</button>
-            <button onclick="setPersona('new_leader')" id="btn-new" class="active">New Leader</button>
-            <button onclick="setPersona('promo_leader')" id="btn-promo">Promoted Leader</button>
-        </div>
+    <div class="controls">
+        <button onclick="setPersona('general')" id="btn-gen">General Employee (N-1)</button>
+        <button onclick="setPersona('new_leader')" id="btn-new">New Leader</button>
+        <button onclick="setPersona('promo_leader')" id="btn-promo">Promoted Leader</button>
     </div>
 
-    <div class="diagram-wrapper">
-        <div class="grid-container" id="grid">
-            </div>
-        <svg id="svg-layer"></svg>
-    </div>
+    <div class="timeline-container">
+        <div class="time-header">Trigger</div>
+        <div class="time-header">Day 1</div>
+        <div class="time-header">Week 1</div>
+        <div class="time-header">Week 2</div>
+        <div class="time-header">30 Days</div>
+        <div class="time-header">45 Days</div>
+        <div class="time-header">60 Days</div>
+        <div class="time-header">90 Days</div>
 
-    <div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
-        <div class="modal" onclick="event.stopPropagation()">
-            <div class="modal-header">
-                <h2 id="modal-title">Step Title</h2>
-                <button class="close-btn" onclick="closeModal()">×</button>
+        <div class="swimlane" id="main-flow">
             </div>
-            <div class="modal-body" id="modal-body">
-                </div>
+
+        <div class="checkpoint-bar">
+            <div class="check-node"><div class="dot active-dot"></div>Trigger</div>
+            <div class="check-node"><div class="dot active-dot"></div>Contract Signed<br>Doc Check</div>
+            <div class="check-node"><div class="dot"></div>Weekly Check</div>
+            <div class="check-node"><div class="dot"></div>Weekly Check</div>
+            <div class="check-node"><div class="dot"></div>30 Day Review</div>
+            <div class="check-node"><div class="dot"></div>45 Day Check</div>
+            <div class="check-node"><div class="dot"></div>60 Day Check</div>
+            <div class="check-node"><div class="dot"></div>90 Day Final</div>
         </div>
     </div>
 
     <script>
-        // --- DATA ---
-        const phases = [
-            "Trigger", "Day 1", "Week 1", "Week 2", 
-            "30 Days", "45 Days", "60 Days", "90 Days"
-        ];
-
+        // Data Structure matching your whiteboard logic
         const steps = [
-            { id: 'trig', title: "Offer Accepted", desc: "Candidate accepts via portal", phase: 0, type: 'general', roles: ['all'], 
-              context: "Trigger event. HR receives notification. Integrations fire to create user profile.", connectTo: ['doc_req', 'welc'] },
+            // TRIGGER PHASE
+            { id: 1, title: "Candidate Accepts Offer", detail: "Process Trigger", phase: 0, type: "general", personas: ["all"] },
+            { id: 2, title: "Request Entry Docs", detail: "Checklist sent to candidate", phase: 0, type: "docs", personas: ["all"] },
+
+            // DAY 1
+            { id: 3, title: "General Welcome", detail: "Office tour & Introductions", phase: 1, type: "general", personas: ["all"] },
+            { id: 4, title: "Sign Contract", detail: "Legal requirement met", phase: 1, type: "docs", personas: ["all"] },
+            { id: 5, title: "Entry Announcement", detail: "Email to Org (New Hire)", phase: 1, type: "general", personas: ["general", "new_leader"] },
+            { id: 6, title: "Promotion Announcement", detail: "Email to Org (Internal)", phase: 1, type: "leader", personas: ["promo_leader"] },
+
+            // WEEK 1 & 2
+            { id: 7, title: "Onboarding Training", detail: "Core Modules", phase: 2, type: "general", personas: ["all"] },
+            { id: 8, title: "Team Intros", detail: "Initial meet & greets", phase: 3, type: "general", personas: ["all"] },
+
+            // 30 DAYS
+            { id: 9, title: "Go Day Plan", detail: "Creation: Focus areas & structure. Review with Manager.", phase: 4, type: "leader", personas: ["new_leader", "promo_leader"] },
+            { id: 10, title: "Stakeholder Meetings", detail: "Input for Go Day Plan", phase: 4, type: "leader", personas: ["new_leader", "promo_leader"] },
+
+            // 60 DAYS
+            { id: 11, title: "60-Day Progress", detail: "Review Go Day Plan execution", phase: 6, type: "leader", personas: ["new_leader", "promo_leader"] },
+
+            // 90 DAYS (Deliverables)
+            { id: 12, title: "Full Action Plan", detail: "Long term strategy", phase: 7, type: "leader", personas: ["new_leader", "promo_leader"] },
+            { id: 13, title: "MBOs Definition", detail: "Management by Objectives", phase: 7, type: "leader", personas: ["new_leader", "promo_leader"] },
+            { id: 14, title: "SWOT Analysis", detail: "Team/Dept analysis", phase: 7, type: "leader", personas: ["new_leader", "promo_leader"] },
+            { id: 15, title: "Team Diagnostic", detail: "Talent assessment", phase: 7, type: "leader", personas: ["new_leader", "promo_leader"] },
             
-            { id: 'doc_req', title: "Request Docs", desc: "Automated checklist sent", phase: 0, type: 'docs', roles: ['all'], 
-              context: "System sends email to candidate requesting: ID, Proof of Address, Bank Info, Tax ID.", connectTo: ['sign'] },
-
-            { id: 'welc', title: "General Welcome", desc: "Reception & IT Handoff", phase: 1, type: 'general', roles: ['all'], 
-              context: "Candidate arrives. Reception provides badge. IT provides laptop and credentials.", connectTo: ['train'] },
-
-            { id: 'sign', title: "Sign Contract", desc: "Legal Team", phase: 1, type: 'docs', roles: ['all'], 
-              context: "Physical or Digital signature of the employment contract. Validated by Legal.", connectTo: [] },
-
-            { id: 'comm_gen', title: "Entry Announcement", desc: "Standard Comms", phase: 1, type: 'general', roles: ['general'], 
-              context: "HR sends 'New Joiner' email to the immediate team and department.", connectTo: ['train'] },
-
-            { id: 'comm_lead', title: "Leadership Announce", desc: "Org-wide Comms", phase: 1, type: 'leader', roles: ['new_leader'], 
-              context: "HR/VP sends organization-wide email introducing the new leader.", connectTo: ['go_day'] },
-
-            { id: 'comm_promo', title: "Promotion Announce", desc: "Internal Comms", phase: 1, type: 'leader', roles: ['promo_leader'], 
-              context: "Announcement of internal promotion sent to the company.", connectTo: ['go_day'] },
-
-            { id: 'train', title: "Core Training", desc: "LMS Modules", phase: 2, type: 'general', roles: ['all'], 
-              context: "Mandatory modules: Compliance, Data Security, Code of Conduct.", connectTo: ['intro'] },
-
-            { id: 'intro', title: "Team Intros", desc: "1:1 Meetings", phase: 3, type: 'general', roles: ['all'], 
-              context: "Scheduled 1:1s with immediate team members and key cross-functional partners.", connectTo: [] },
-
-            { id: 'go_day', title: "Go Day Plan", desc: "Create 30-Day Strategy", phase: 4, type: 'leader', roles: ['new_leader', 'promo_leader'], 
-              context: "<b>Leader Only:</b> Create a structured plan for the first 30 days. <br><b>Deliverable:</b> Draft presentation reviewed by Manager.", connectTo: ['rev_60'] },
-
-            { id: 'rev_30', title: "30-Day Check", desc: "HR BP Check-in", phase: 4, type: 'general', roles: ['general'], 
-              context: "Casual check-in to ensure access to tools and integration into culture.", connectTo: [] },
-
-            { id: 'rev_60', title: "60-Day Review", desc: "Plan Execution Check", phase: 6, type: 'leader', roles: ['new_leader', 'promo_leader'], 
-              context: "Review progress against the Go Day Plan. Adjust priorities if needed.", connectTo: ['final_90'] },
-
-            { id: 'final_90', title: "90-Day Deliverables", desc: "MBOs & SWOT", phase: 7, type: 'leader', roles: ['new_leader', 'promo_leader'], 
-              context: "<b>Final Output:</b><br>- Full Action Plan<br>- MBOs defined<br>- SWOT Analysis<br>- Team Diagnostic", connectTo: [] },
-            
-            { id: 'probation', title: "Probation Review", desc: "Confirm Employment", phase: 7, type: 'general', roles: ['general'], 
-              context: "Formal review to confirm end of probation period.", connectTo: [] }
+            // Employee 90 Day
+            { id: 16, title: "Probation Review", detail: "Performance confirm", phase: 7, type: "general", personas: ["general"] }
         ];
 
-        let currentRole = 'new_leader';
+        // Configuration
+        const phases = [0, 1, 2, 3, 4, 5, 6, 7]; // Corresponds to columns
+        
+        function setPersona(persona) {
+            // Update buttons
+            document.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+            if(persona === 'general') document.getElementById('btn-gen').classList.add('active');
+            if(persona === 'new_leader') document.getElementById('btn-new').classList.add('active');
+            if(persona === 'promo_leader') document.getElementById('btn-promo').classList.add('active');
 
-        // --- RENDER LOGIC ---
-        function init() {
-            setPersona('new_leader');
-            window.addEventListener('resize', drawLines);
+            render(persona);
         }
 
-        function setPersona(role) {
-            currentRole = role;
-            document.querySelectorAll('.controls button').forEach(b => b.classList.remove('active'));
-            if(role === 'general') document.getElementById('btn-gen').classList.add('active');
-            if(role === 'new_leader') document.getElementById('btn-new').classList.add('active');
-            if(role === 'promo_leader') document.getElementById('btn-promo').classList.add('active');
-            render();
-        }
+        function render(currentPersona) {
+            const container = document.getElementById('main-flow');
+            container.innerHTML = ''; // Clear current
 
-        function render() {
-            const container = document.getElementById('grid');
-            container.innerHTML = '';
+            // Create columns for the grid
+            // We iterate through phases 0 to 7 to ensure grid structure holds
+            for (let i = 0; i < 8; i++) {
+                const column = document.createElement('div');
+                column.style.gridColumn = `${i + 1} / span 1`;
+                column.style.display = 'flex';
+                column.style.flexDirection = 'column';
+                column.style.gap = '10px';
 
-            // 1. Build Columns
-            const columns = [];
-            for(let i=0; i<8; i++) {
-                const col = document.createElement('div');
-                col.className = 'time-column';
-                col.innerHTML = `<div class="col-header">${phases[i]}</div>`;
-                container.appendChild(col);
-                columns.push(col);
-            }
+                // Find steps for this phase and persona
+                const columnSteps = steps.filter(step => 
+                    step.phase === i && 
+                    (step.personas.includes('all') || step.personas.includes(currentPersona))
+                );
 
-            // 2. Filter & Place Cards
-            const visibleSteps = steps.filter(s => s.roles.includes('all') || s.roles.includes(currentRole));
-            
-            visibleSteps.forEach(step => {
-                const card = document.createElement('div');
-                card.className = `card ${step.type}`;
-                card.id = `card-${step.id}`;
-                card.innerHTML = `<h4>${step.title}</h4><p>${step.desc}</p>`;
-                card.onclick = () => openModal(step);
-                
-                // Append to correct column
-                columns[step.phase].appendChild(card);
-            });
-
-            // 3. Draw Lines (after DOM layout)
-            setTimeout(() => drawLines(visibleSteps), 50);
-        }
-
-        function drawLines(visibleSteps) {
-            const svg = document.getElementById('svg-layer');
-            svg.innerHTML = `
-                <defs>
-                    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
-                        <path d="M0,0 L0,6 L9,3 z" fill="#94a3b8" />
-                    </marker>
-                </defs>
-            `;
-
-            // If we didn't pass steps, filter them again
-            if(!visibleSteps) {
-                visibleSteps = steps.filter(s => s.roles.includes('all') || s.roles.includes(currentRole));
-            }
-
-            visibleSteps.forEach(source => {
-                source.connectTo.forEach(targetId => {
-                    // Is target visible?
-                    if(!visibleSteps.find(s => s.id === targetId)) return;
-
-                    const startEl = document.getElementById(`card-${source.id}`);
-                    const endEl = document.getElementById(`card-${targetId}`);
-
-                    if(startEl && endEl) {
-                        drawLinearPath(svg, startEl, endEl);
-                    }
+                columnSteps.forEach(step => {
+                    const card = document.createElement('div');
+                    card.className = `card ${step.type}`;
+                    card.innerHTML = `
+                        <div class="card-title">${step.title}</div>
+                        <div class="card-detail">${step.detail}</div>
+                    `;
+                    column.appendChild(card);
                 });
-            });
+
+                container.appendChild(column);
+            }
         }
 
-        function drawLinearPath(svg, startEl, endEl) {
-            const svgRect = svg.getBoundingClientRect();
-            const sRect = startEl.getBoundingClientRect();
-            const eRect = endEl.getBoundingClientRect();
-
-            const x1 = sRect.right - svgRect.left;
-            const y1 = sRect.top + sRect.height/2 - svgRect.top;
-            const x2 = eRect.left - svgRect.left;
-            const y2 = eRect.top + eRect.height/2 - svgRect.top;
-
-            // Orthogonal Routing Logic
-            // Go right half-way, then up/down, then right to target
-            const midX = x1 + (x2 - x1) / 2;
-            
-            // Create Polyline string
-            const points = `${x1},${y1} ${midX},${y1} ${midX},${y2} ${x2},${y2}`;
-
-            const polyline = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
-            polyline.setAttribute("points", points);
-            polyline.setAttribute("fill", "none");
-            polyline.setAttribute("stroke", "#94a3b8");
-            polyline.setAttribute("stroke-width", "2");
-            polyline.setAttribute("marker-end", "url(#arrow)");
-
-            svg.appendChild(polyline);
-        }
-
-        // --- MODAL ---
-        function openModal(stepData) {
-            document.getElementById('modal-title').innerText = stepData.title;
-            document.getElementById('modal-body').innerHTML = `
-                <h5>Description</h5>
-                <p>${stepData.context}</p>
-                <h5>Phase</h5>
-                <p>${phases[stepData.phase]}</p>
-                <h5>Owner</h5>
-                <p>${stepData.type.toUpperCase()}</p>
-            `;
-            document.getElementById('modal-overlay').style.display = 'flex';
-        }
-
-        function closeModal(e) {
-            if(e) e.stopPropagation(); // prevent clicking through
-            document.getElementById('modal-overlay').style.display = 'none';
-        }
-
-        // Start
-        init();
+        // Initialize
+        setPersona('new_leader');
 
     </script>
 </body>
