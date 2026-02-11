@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HD Onboarding - Interactive Manager</title>
+  <title>HD Onboarding - Edge Optimized</title>
   <style>
     :root {
       --primary: #2563eb;
@@ -33,7 +33,7 @@
       overflow: hidden;
     }
 
-    /* --- Header & Controls --- */
+    /* --- Header --- */
     .header-controls {
       background: white;
       padding: 12px 24px;
@@ -49,108 +49,59 @@
     .title-block h1 { margin: 0; font-size: 1.25rem; color: #0f172a; }
     .title-block p { margin: 2px 0 0; color: var(--secondary); font-size: 0.8rem; }
 
-    .center-controls {
-        display: flex;
-        align-items: center;
-        gap: 20px;
-    }
-
-    /* Legend */
-    .legend {
-        display: flex;
-        gap: 15px;
-        font-size: 0.75rem;
-        color: var(--secondary);
-        border-right: 1px solid var(--border);
-        padding-right: 20px;
-        display: none; /* Hidden on small screens */
-    }
-    @media (min-width: 1200px) { .legend { display: flex; } }
-
+    .center-controls { display: flex; align-items: center; gap: 20px; }
+    
+    .legend { display: flex; gap: 15px; font-size: 0.75rem; color: var(--secondary); border-right: 1px solid var(--border); padding-right: 20px; }
     .legend-item { display: flex; align-items: center; gap: 6px; }
     .dot { width: 8px; height: 8px; border-radius: 50%; }
     .dot.gen { background: var(--gen-color); }
     .dot.lead { background: var(--leader-color); }
     .dot.doc { background: var(--doc-color); }
 
-    .btn-group {
-      display: flex;
-      gap: 5px;
-      background: #f1f5f9;
-      padding: 4px;
-      border-radius: 8px;
-    }
-
+    .btn-group { display: flex; gap: 5px; background: #f1f5f9; padding: 4px; border-radius: 8px; }
+    
     button.filter-btn {
-      padding: 6px 12px;
-      border: 1px solid transparent;
-      background: transparent;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 0.8rem;
-      font-weight: 600;
-      color: var(--secondary);
-      transition: all 0.2s;
+      padding: 6px 12px; border: 1px solid transparent; background: transparent;
+      border-radius: 6px; cursor: pointer; font-size: 0.8rem; font-weight: 600;
+      color: var(--secondary); transition: all 0.2s;
     }
-
     button.filter-btn:hover { background: rgba(255,255,255,0.6); }
+    button.filter-btn.active { background: white; color: var(--primary); box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-color: #e2e8f0; }
 
-    button.filter-btn.active {
-      background: white;
-      color: var(--primary);
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-      border-color: #e2e8f0;
-    }
-
-    /* Action Buttons */
     .action-btn {
-        background: var(--primary);
-        color: white;
-        border: none;
-        padding: 8px 16px;
-        border-radius: 6px;
-        font-size: 0.85rem;
-        font-weight: 600;
-        cursor: pointer;
+        background: var(--primary); color: white; border: none; padding: 8px 16px;
+        border-radius: 6px; font-size: 0.85rem; font-weight: 600; cursor: pointer;
         box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
-        display: flex;
-        align-items: center;
-        gap: 6px;
     }
     .action-btn:hover { background: var(--primary-dark); }
-    
-    .reset-btn {
-        background: transparent;
-        color: var(--secondary);
-        border: 1px solid var(--border);
-        box-shadow: none;
-    }
+    .reset-btn { background: transparent; color: var(--secondary); border: 1px solid var(--border); box-shadow: none; }
     .reset-btn:hover { background: #f1f5f9; color: #ef4444; border-color: #ef4444; }
 
     /* --- Main Scrollable Area --- */
     .diagram-wrapper {
       flex: 1;
-      overflow: auto;
+      overflow: auto; /* Allows both X and Y scroll */
       position: relative;
       background: var(--bg);
+      /* This ensures the sticky elements work relative to this container */
+      scroll-behavior: smooth;
     }
 
     /* --- The Grid System --- */
     .grid-container {
       display: flex;
-      min-width: 1600px;
-      min-height: 100%;
+      min-width: 1600px; /* Force horizontal scroll */
+      /* Ensure height fills at least the viewport so footer sticks correctly */
+      min-height: calc(100% - 70px); 
       position: relative;
-      padding-bottom: 80px; /* Space for checkpoints */
     }
 
     .time-column {
       flex: 1;
       min-width: 200px;
       border-right: 1px dashed var(--border);
-      display: flex;
-      flex-direction: column;
-      padding: 70px 20px 20px 20px;
+      display: flex; flex-direction: column;
+      padding: 60px 20px 20px 20px;
       gap: 30px;
       position: relative;
     }
@@ -159,154 +110,80 @@
     .time-column:nth-child(odd) { background-color: var(--column-odd); }
 
     .col-header {
-      position: absolute;
-      top: 0; left: 0; width: 100%;
-      text-align: center;
-      padding: 20px 0;
-      font-weight: 800; /* Bold Headers */
-      text-transform: uppercase;
-      font-size: 0.85rem;
-      color: #334155;
-      border-bottom: 1px solid rgba(0,0,0,0.05);
-      background: inherit;
-      z-index: 5;
+      position: absolute; top: 0; left: 0; width: 100%;
+      text-align: center; padding: 20px 0;
+      font-weight: 800; text-transform: uppercase; font-size: 0.85rem;
+      color: #334155; border-bottom: 1px solid rgba(0,0,0,0.05);
+      background: inherit; z-index: 5;
     }
 
     /* --- Cards --- */
     .node-card {
-      background: white;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 14px;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-      transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      cursor: pointer;
-      position: relative;
-      z-index: 10;
+      background: white; border: 1px solid var(--border); border-radius: 8px;
+      padding: 14px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+      transition: all 0.2s; cursor: pointer; position: relative; z-index: 10;
     }
-
-    .node-card:hover {
-      transform: translateY(-4px) scale(1.01);
-      box-shadow: 0 12px 20px -5px rgba(0, 0, 0, 0.1);
-      border-color: var(--primary);
-    }
-
+    .node-card:hover { transform: translateY(-4px) scale(1.01); box-shadow: 0 12px 20px -5px rgba(0, 0, 0, 0.1); border-color: var(--primary); }
     .node-card.leader { border-left: 4px solid var(--leader-color); }
     .node-card.general { border-left: 4px solid var(--gen-color); }
     .node-card.docs { border-left: 4px solid var(--doc-color); }
 
     .node-title { font-weight: 700; font-size: 0.9rem; margin-bottom: 5px; }
     .node-meta { font-size: 0.75rem; color: var(--secondary); line-height: 1.4; }
-
-    .stack-badge {
-      background: #fef2f2; color: #dc2626;
-      padding: 2px 6px; border-radius: 4px;
-      font-size: 0.65rem; display: inline-block;
-      margin-top: 8px; font-weight: 700;
-    }
-
-    /* Delete Button for Custom Cards */
+    .stack-badge { background: #fef2f2; color: #dc2626; padding: 2px 6px; border-radius: 4px; font-size: 0.65rem; display: inline-block; margin-top: 8px; font-weight: 700; }
+    
     .delete-step-btn {
-        position: absolute;
-        top: 5px; right: 5px;
-        width: 20px; height: 20px;
-        background: #fee2e2;
-        color: #ef4444;
-        border-radius: 50%;
-        border: none;
-        display: flex; align-items: center; justify-content: center;
-        cursor: pointer;
-        font-size: 12px;
-        opacity: 0;
-        transition: opacity 0.2s;
+        position: absolute; top: 5px; right: 5px; width: 20px; height: 20px;
+        background: #fee2e2; color: #ef4444; border-radius: 50%; border: none;
+        display: flex; align-items: center; justify-content: center; cursor: pointer;
+        font-size: 12px; opacity: 0; transition: opacity 0.2s;
     }
     .node-card:hover .delete-step-btn { opacity: 1; }
-    .delete-step-btn:hover { background: #ef4444; color: white; }
 
     /* --- SVG Layer --- */
-    #svg-layer {
-      position: absolute;
-      top: 0; left: 0;
-      pointer-events: none;
-      z-index: 8;
-    }
+    #svg-layer { position: absolute; top: 0; left: 0; pointer-events: none; z-index: 8; }
 
-    /* --- Popover --- */
-    .popover {
-      position: absolute;
-      background: white;
-      width: 280px;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 20px 50px -10px rgba(0,0,0,0.25);
-      border: 1px solid var(--border);
-      z-index: 100;
-
-      opacity: 0;
-      transform: translateY(10px) scale(0.96);
-      pointer-events: none;
-      transition: opacity 0.15s, transform 0.15s;
-    }
-
-    .popover.active {
-      opacity: 1;
-      transform: translateY(0) scale(1);
-      pointer-events: auto;
-    }
-
-    .popover::after {
-      content: '';
-      position: absolute;
-      top: 20px; left: -8px;
-      width: 16px; height: 16px;
-      background: white;
-      border-left: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-      transform: rotate(45deg);
-    }
-
-    .popover.flip-left::after {
-        left: auto; right: -8px;
-        border-left: none; border-bottom: none;
-        border-top: 1px solid var(--border);
-        border-right: 1px solid var(--border);
-    }
-
-    .popover h4 { margin: 0 0 10px 0; color: var(--primary); font-size: 1rem; }
-    .popover-content { font-size: 0.85rem; color: #334155; line-height: 1.5; max-height: 200px; overflow-y: auto; }
-    .popover-meta { margin-top: 15px; padding-top: 10px; border-top: 1px solid #f1f5f9; font-size: 0.75rem; color: #94a3b8; font-weight: 600; }
-
-    /* Overlay for clicking outside */
-    .dismiss-overlay{ position:absolute; inset:0; z-index:95; display:none; }
-    .dismiss-overlay.active{ display:block; }
-
-    /* --- Checkpoints Footer --- */
+    /* --- Checkpoints Footer (REFACTORED FOR EDGE) --- */
+    /* This is now INSIDE the scroll wrapper, not fixed to screen */
     .checkpoints-bar {
-      position: fixed; bottom: 0; left: 0; width: 100%; height: 70px;
-      display: flex; background: white;
+      position: sticky; /* Magic fix: Sticks to bottom of diagram-wrapper */
+      bottom: 0;
+      left: 0;
+      min-width: 1600px; /* Match grid width */
+      height: 70px;
+      display: flex;
+      background: white; /* Solid background prevents "erased" look */
       border-top: 2px solid var(--primary);
-      box-shadow: 0 -4px 20px rgba(0,0,0,0.05);
-      z-index: 100;
-      align-items: center;
+      z-index: 100; /* Above cards */
+      box-shadow: 0 -4px 10px rgba(0,0,0,0.03);
     }
 
-    .check-label {
-      width: 150px; padding-left: 30px; font-weight: 800;
-      color: var(--primary); text-transform: uppercase; font-size: 0.8rem;
-      flex-shrink: 0; background: white; z-index: 101;
-    }
-
-    .check-scroll-container {
-      display: flex; flex: 1; overflow: hidden; height: 100%;
+    /* The "CHECKPOINTS" Label */
+    .check-label-container {
+        position: sticky; /* Magic fix: Sticks to left of screen when scrolling right */
+        left: 0;
+        width: 150px;
+        background: white; /* Covers the dots passing under */
+        display: flex;
+        align-items: center;
+        padding-left: 30px;
+        font-weight: 800;
+        color: var(--primary);
+        text-transform: uppercase;
+        font-size: 0.8rem;
+        z-index: 102; /* Topmost */
+        border-right: 2px solid #f1f5f9;
+        box-shadow: 4px 0 10px rgba(255,255,255,1); /* Fade effect */
     }
 
     .check-col {
-      flex: 1; min-width: 200px;
+      flex: 1; /* Auto-matches columns above */
       display: flex; flex-direction: column;
       justify-content: center; align-items: center;
       font-size: 0.75rem; color: var(--secondary);
       border-right: 1px dashed var(--border);
       background: #f8fafc;
+      position: relative;
     }
 
     .check-dot {
@@ -316,31 +193,41 @@
       box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
     }
 
-    /* --- ADD PROCESS MODAL --- */
+    /* --- Popover --- */
+    .popover {
+      position: absolute; background: white; width: 280px; padding: 20px;
+      border-radius: 12px; box-shadow: 0 20px 50px -10px rgba(0,0,0,0.25);
+      border: 1px solid var(--border); z-index: 200;
+      opacity: 0; transform: translateY(10px) scale(0.96); pointer-events: none;
+      transition: opacity 0.15s, transform 0.15s;
+    }
+    .popover.active { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
+    .popover::after {
+      content: ''; position: absolute; top: 20px; left: -8px; width: 16px; height: 16px;
+      background: white; border-left: 1px solid var(--border); border-bottom: 1px solid var(--border);
+      transform: rotate(45deg);
+    }
+    .popover.flip-left::after { left: auto; right: -8px; border-left: none; border-bottom: none; border-top: 1px solid var(--border); border-right: 1px solid var(--border); }
+    .popover h4 { margin: 0 0 10px 0; color: var(--primary); font-size: 1rem; }
+    .popover-content { font-size: 0.85rem; color: #334155; line-height: 1.5; max-height: 200px; overflow-y: auto; }
+    .popover-meta { margin-top: 15px; padding-top: 10px; border-top: 1px solid #f1f5f9; font-size: 0.75rem; color: #94a3b8; font-weight: 600; }
+    
+    .dismiss-overlay{ position:absolute; inset:0; z-index:95; display:none; }
+    .dismiss-overlay.active{ display:block; }
+
+    /* --- Add Modal --- */
     .modal-overlay {
         position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-        background: rgba(0,0,0,0.5); z-index: 999;
-        display: none; align-items: center; justify-content: center;
-        backdrop-filter: blur(2px);
+        background: rgba(0,0,0,0.5); z-index: 999; display: none;
+        align-items: center; justify-content: center; backdrop-filter: blur(2px);
     }
     .modal-overlay.active { display: flex; }
-
-    .modal-card {
-        background: white; width: 400px; max-width: 90%;
-        border-radius: 12px; padding: 25px;
-        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-    }
-    
+    .modal-card { background: white; width: 400px; max-width: 90%; border-radius: 12px; padding: 25px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); }
     .modal-card h2 { margin-top: 0; font-size: 1.25rem; color: #0f172a; }
-    
     .form-group { margin-bottom: 15px; }
     .form-group label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 5px; color: #334155; }
-    .form-group input, .form-group select, .form-group textarea {
-        width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px;
-        font-family: inherit; font-size: 0.9rem; box-sizing: border-box;
-    }
+    .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-family: inherit; font-size: 0.9rem; box-sizing: border-box; }
     .form-group textarea { height: 80px; resize: vertical; }
-
     .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
     .btn-cancel { background: white; border: 1px solid #cbd5e1; color: #64748b; padding: 8px 16px; border-radius: 6px; cursor: pointer; }
     .btn-save { background: var(--primary); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; }
@@ -354,21 +241,18 @@
       <h1>HD Onboarding Map</h1>
       <p>Interactive Manager • <span id="item-count">0</span> Steps</p>
     </div>
-    
     <div class="center-controls">
         <div class="legend">
             <div class="legend-item"><div class="dot gen"></div> General</div>
             <div class="legend-item"><div class="dot lead"></div> Leader</div>
             <div class="legend-item"><div class="dot doc"></div> Docs</div>
         </div>
-
         <div class="btn-group">
             <button onclick="setPersona('general')" id="btn-gen" class="filter-btn">General</button>
             <button onclick="setPersona('new_leader')" id="btn-new" class="filter-btn active">New Leader</button>
             <button onclick="setPersona('promo_leader')" id="btn-promo" class="filter-btn">Promoted</button>
         </div>
     </div>
-
     <div style="display: flex; gap: 10px;">
         <button class="action-btn reset-btn" onclick="resetData()">Reset</button>
         <button class="action-btn" onclick="openAddModal()">+ Add Process</button>
@@ -377,8 +261,14 @@
 
   <div class="diagram-wrapper" id="scroll-area">
     <div class="dismiss-overlay" id="dismiss"></div>
+    
     <div class="grid-container" id="main-grid"></div>
+    
     <svg id="svg-layer"></svg>
+
+    <div class="checkpoints-bar" id="checkpoints-bar">
+        <div class="check-label-container">CHECKPOINTS</div>
+        </div>
 
     <div class="popover" id="detail-popover">
       <h4 id="pop-title">Title</h4>
@@ -387,25 +277,15 @@
     </div>
   </div>
 
-  <div class="checkpoints-bar">
-    <div class="check-label">CHECKPOINTS</div>
-    <div class="check-scroll-container" id="checkpoints-inner"></div>
-  </div>
-
   <div class="modal-overlay" id="add-modal">
     <div class="modal-card">
         <h2>Add New Process</h2>
-        
         <div class="form-group">
-            <label>Title</label>
-            <input type="text" id="new-title" placeholder="e.g., Meet with VP">
+            <label>Title</label> <input type="text" id="new-title" placeholder="e.g., Meet with VP">
         </div>
-
         <div class="form-group">
-            <label>Short Description</label>
-            <input type="text" id="new-desc" placeholder="e.g., Strategic Alignment">
+            <label>Short Description</label> <input type="text" id="new-desc" placeholder="e.g., Strategic Alignment">
         </div>
-
         <div class="form-group">
             <label>Time Phase</label>
             <select id="new-phase">
@@ -419,7 +299,6 @@
                 <option value="7">90 Days</option>
             </select>
         </div>
-
         <div class="form-group">
             <label>Applies To (Role)</label>
             <select id="new-role">
@@ -428,12 +307,9 @@
                 <option value="docs">Documentation (All)</option>
             </select>
         </div>
-
         <div class="form-group">
-            <label>Full Context (for pop-up)</label>
-            <textarea id="new-context" placeholder="Enter detailed instructions..."></textarea>
+            <label>Full Context</label> <textarea id="new-context" placeholder="Enter detailed instructions..."></textarea>
         </div>
-
         <div class="modal-actions">
             <button class="btn-cancel" onclick="closeAddModal()">Cancel</button>
             <button class="btn-save" onclick="saveNewStep()">Save Process</button>
@@ -462,113 +338,58 @@
       { id:'probation', title:"Probation Review", desc:"Employment Confirm", phase:7, type:'general', roles:['general'], context:"Formal performance review.", connectTo:[] }
     ];
 
-    // Current State
     let steps = [];
     let currentRole = 'new_leader';
 
     function init() {
-        // Load from LocalStorage if available, else use default
-        const saved = localStorage.getItem('hd_onboarding_v5');
-        if(saved) {
-            steps = JSON.parse(saved);
-        } else {
-            steps = JSON.parse(JSON.stringify(defaultSteps)); // Deep copy
-        }
-
+        const saved = localStorage.getItem('hd_onboarding_v6');
+        steps = saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(defaultSteps));
         setPersona('new_leader');
 
-        // Sync scrolling
+        // Scroll listener ONLY for Line redrawing (Checkpoint bar handles itself via CSS Sticky)
         const mainArea = document.getElementById('scroll-area');
-        const checkArea = document.getElementById('checkpoints-inner');
         mainArea.addEventListener('scroll', () => {
-            checkArea.style.transform = `translateX(-${mainArea.scrollLeft}px)`;
-            drawLines(); // Keep lines synced
+            drawLines();
         });
-
-        // Close Popovers/Modals
         document.getElementById('dismiss').addEventListener('click', hidePopover);
-        
-        // Window Resize
         window.addEventListener('resize', () => {
             clearTimeout(window.resizeTimer);
             window.resizeTimer = setTimeout(() => drawLines(), 100);
         });
     }
 
-    // --- DATA MANAGEMENT ---
+    // --- DATA ---
     function saveData() {
-        localStorage.setItem('hd_onboarding_v5', JSON.stringify(steps));
+        localStorage.setItem('hd_onboarding_v6', JSON.stringify(steps));
         document.getElementById('item-count').innerText = steps.length;
     }
-
     function resetData() {
-        if(confirm("Are you sure? This will delete all custom steps.")) {
-            steps = JSON.parse(JSON.stringify(defaultSteps));
-            saveData();
-            render();
-        }
+        if(confirm("Reset all data?")) { steps = JSON.parse(JSON.stringify(defaultSteps)); saveData(); render(); }
     }
-
     function saveNewStep() {
         const title = document.getElementById('new-title').value;
-        const desc = document.getElementById('new-desc').value;
         const phase = parseInt(document.getElementById('new-phase').value);
         const roleType = document.getElementById('new-role').value;
-        const context = document.getElementById('new-context').value;
+        if(!title) { alert("Title required"); return; }
 
-        if(!title) { alert("Please enter a title"); return; }
+        let rolesArr = roleType === 'new_leader' ? ['new_leader', 'promo_leader'] : (roleType === 'general' ? ['general', 'all'] : ['all']);
+        let typeClass = roleType === 'new_leader' ? 'leader' : (roleType === 'general' ? 'general' : 'docs');
 
-        let rolesArr = [];
-        let typeClass = '';
-
-        if(roleType === 'new_leader') {
-            rolesArr = ['new_leader', 'promo_leader'];
-            typeClass = 'leader';
-        } else if (roleType === 'general') {
-            rolesArr = ['general', 'all'];
-            typeClass = 'general';
-        } else {
-            rolesArr = ['all'];
-            typeClass = 'docs';
-        }
-
-        const newStep = {
-            id: 'custom_' + Date.now(),
-            title: title,
-            desc: desc,
-            phase: phase,
-            type: typeClass,
-            roles: rolesArr,
-            context: context || "Custom added process.",
-            connectTo: [], // Custom nodes don't auto-connect lines yet
-            isCustom: true
-        };
-
-        steps.push(newStep);
-        saveData();
-        closeAddModal();
-        render();
+        steps.push({
+            id: 'custom_' + Date.now(), title: title, desc: document.getElementById('new-desc').value,
+            phase: phase, type: typeClass, roles: rolesArr,
+            context: document.getElementById('new-context').value || "Custom process.",
+            connectTo: [], isCustom: true
+        });
+        saveData(); closeAddModal(); render();
     }
-
     function deleteStep(id) {
-        if(confirm("Remove this step?")) {
-            steps = steps.filter(s => s.id !== id);
-            saveData();
-            render();
-        }
+        if(confirm("Delete step?")) { steps = steps.filter(s => s.id !== id); saveData(); render(); }
     }
 
-    // --- UI LOGIC ---
-    function openAddModal() {
-        document.getElementById('add-modal').classList.add('active');
-    }
-    function closeAddModal() {
-        document.getElementById('add-modal').classList.remove('active');
-        // Clear form
-        document.getElementById('new-title').value = '';
-        document.getElementById('new-desc').value = '';
-        document.getElementById('new-context').value = '';
-    }
+    // --- UI ---
+    function openAddModal() { document.getElementById('add-modal').classList.add('active'); }
+    function closeAddModal() { document.getElementById('add-modal').classList.remove('active'); }
 
     function setPersona(role) {
         currentRole = role;
@@ -576,63 +397,47 @@
         if(role === 'general') document.getElementById('btn-gen').classList.add('active');
         if(role === 'new_leader') document.getElementById('btn-new').classList.add('active');
         if(role === 'promo_leader') document.getElementById('btn-promo').classList.add('active');
-        
-        hidePopover();
-        render();
+        hidePopover(); render();
     }
 
     function render() {
         const grid = document.getElementById('main-grid');
-        const checkInner = document.getElementById('checkpoints-inner');
+        const checkBar = document.getElementById('checkpoints-bar');
+        
+        // Clear grid but KEEP the label in the checkpoint bar
         grid.innerHTML = '';
-        checkInner.innerHTML = '';
+        // Remove old columns from checkpoint bar (keep first child: label)
+        while (checkBar.children.length > 1) { checkBar.removeChild(checkBar.lastChild); }
         
         document.getElementById('item-count').innerText = steps.length;
 
-        // 1. Columns
         const colElements = [];
         phases.forEach((phaseName, idx) => {
+            // Main Grid Column
             const col = document.createElement('div');
             col.className = 'time-column';
             col.innerHTML = `<div class="col-header">${phaseName}</div>`;
             grid.appendChild(col);
             colElements.push(col);
 
+            // Checkpoint Column (Appended to Sticky Bar)
             const checkCol = document.createElement('div');
             checkCol.className = 'check-col';
-            checkCol.innerHTML = `<div class="check-dot"></div>${phaseName === 'Trigger' ? 'Trigger' : 'Check'}`;
-            checkInner.appendChild(checkCol);
+            checkCol.innerHTML = `<div class="check-dot"></div><div>${idx === 0 ? 'Trigger' : 'Check'}</div>`;
+            checkBar.appendChild(checkCol);
         });
 
-        // 2. Cards
         const visibleSteps = steps.filter(s => s.roles.includes('all') || s.roles.includes(currentRole));
 
         visibleSteps.forEach(step => {
             const card = document.createElement('div');
             card.className = `node-card ${step.type}`;
             card.id = `card-${step.id}`;
-            
-            let html = `
-                <div class="node-title">${step.title}</div>
-                <div class="node-meta">${step.desc}</div>
-                ${step.type === 'leader' ? '<span class="stack-badge">Leader Task</span>' : ''}
-            `;
-
-            // Add delete button if custom
-            if(step.isCustom) {
-                html += `<button class="delete-step-btn" onclick="deleteStep('${step.id}'); event.stopPropagation();">×</button>`;
-            }
-
+            let html = `<div class="node-title">${step.title}</div><div class="node-meta">${step.desc}</div>${step.type === 'leader' ? '<span class="stack-badge">Leader Task</span>' : ''}`;
+            if(step.isCustom) html += `<button class="delete-step-btn" onclick="deleteStep('${step.id}'); event.stopPropagation();">×</button>`;
             card.innerHTML = html;
-            
-            card.onclick = (e) => {
-                e.stopPropagation();
-                showPopover(step, card);
-            };
-
-            if(colElements[step.phase]) {
-                colElements[step.phase].appendChild(card);
-            }
+            card.onclick = (e) => { e.stopPropagation(); showPopover(step, card); };
+            if(colElements[step.phase]) colElements[step.phase].appendChild(card);
         });
 
         setTimeout(() => drawLines(visibleSteps), 50);
@@ -644,7 +449,6 @@
         const wrapper = document.getElementById('scroll-area');
         const cardRect = cardEl.getBoundingClientRect();
         const wrapperRect = wrapper.getBoundingClientRect();
-        const containerWidth = wrapper.clientWidth;
 
         document.getElementById('pop-title').innerText = data.title;
         document.getElementById('pop-desc').innerHTML = data.context;
@@ -653,84 +457,54 @@
         let leftPos = (cardRect.right - wrapperRect.left) + wrapper.scrollLeft + 20; 
         let topPos = (cardRect.top - wrapperRect.top) + wrapper.scrollTop - 10;
         
-        const popWidth = 280; 
-        const isOverflow = (cardRect.right + popWidth + 40) > containerWidth;
-
-        pop.classList.remove('flip-left');
-
-        if(isOverflow) {
-            leftPos = (cardRect.left - wrapperRect.left) + wrapper.scrollLeft - popWidth - 20;
+        if((cardRect.right + 300) > wrapper.clientWidth) {
+            leftPos = (cardRect.left - wrapperRect.left) + wrapper.scrollLeft - 300;
             pop.classList.add('flip-left');
-        }
+        } else { pop.classList.remove('flip-left'); }
 
-        pop.style.top = topPos + 'px';
-        pop.style.left = leftPos + 'px';
-        pop.classList.add('active');
-        document.getElementById('dismiss').classList.add('active');
+        pop.style.top = topPos + 'px'; pop.style.left = leftPos + 'px';
+        pop.classList.add('active'); document.getElementById('dismiss').classList.add('active');
     }
-
-    function hidePopover() {
-        document.getElementById('detail-popover').classList.remove('active');
-        document.getElementById('dismiss').classList.remove('active');
-    }
+    function hidePopover() { document.getElementById('detail-popover').classList.remove('active'); document.getElementById('dismiss').classList.remove('active'); }
 
     // --- LINES ---
     function drawLines(visibleSteps) {
         const svg = document.getElementById('svg-layer');
-        // Ensure SVG matches grid size
         const grid = document.getElementById('main-grid');
+        // Match SVG size to Scrollable Grid
         svg.style.width = grid.scrollWidth + 'px';
         svg.style.height = grid.scrollHeight + 'px';
-
-        svg.innerHTML = `
-            <defs>
-                <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
-                    <path d="M0,0 L0,6 L9,3 z" fill="#94a3b8" />
-                </marker>
-            </defs>
-        `;
-
+        
+        svg.innerHTML = `<defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L0,6 L9,3 z" fill="#94a3b8" /></marker></defs>`;
+        
         if(!visibleSteps) visibleSteps = steps.filter(s => s.roles.includes('all') || s.roles.includes(currentRole));
-
         visibleSteps.forEach(source => {
             if(!source.connectTo) return;
             source.connectTo.forEach(targetId => {
                 if(!visibleSteps.find(s => s.id === targetId)) return;
-
                 const startEl = document.getElementById(`card-${source.id}`);
                 const endEl = document.getElementById(`card-${targetId}`);
-                
-                if(startEl && endEl) {
-                    drawPolyline(svg, startEl, endEl);
-                }
+                if(startEl && endEl) drawPolyline(svg, startEl, endEl);
             });
         });
     }
 
     function drawPolyline(svg, startEl, endEl) {
-        const svgRect = svg.getBoundingClientRect(); // relative to viewport
-        const wrapper = document.getElementById('scroll-area');
-        
+        const svgRect = svg.getBoundingClientRect(); 
         const sRect = startEl.getBoundingClientRect();
         const eRect = endEl.getBoundingClientRect();
 
-        // Calculate position relative to the SVG/Scroll content
-        // x = (element screen x - wrapper screen x) + scrollAmount
+        // Coordinates relative to SVG canvas
         const x1 = (sRect.right - svgRect.left);
         const y1 = (sRect.top + sRect.height/2 - svgRect.top);
         const x2 = (eRect.left - svgRect.left);
         const y2 = (eRect.top + eRect.height/2 - svgRect.top);
-
         const midX = x1 + (x2 - x1) / 2;
-        const points = `${x1},${y1} ${midX},${y1} ${midX},${y2} ${x2},${y2}`;
-
+        
         const polyline = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
-        polyline.setAttribute("points", points);
-        polyline.setAttribute("fill", "none");
-        polyline.setAttribute("stroke", "#cbd5e1");
-        polyline.setAttribute("stroke-width", "2");
-        polyline.setAttribute("marker-end", "url(#arrow)");
-
+        polyline.setAttribute("points", `${x1},${y1} ${midX},${y1} ${midX},${y2} ${x2},${y2}`);
+        polyline.setAttribute("fill", "none"); polyline.setAttribute("stroke", "#cbd5e1");
+        polyline.setAttribute("stroke-width", "2"); polyline.setAttribute("marker-end", "url(#arrow)");
         svg.appendChild(polyline);
     }
 
