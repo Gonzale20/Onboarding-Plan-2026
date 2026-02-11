@@ -1,480 +1,400 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>HD Onboarding Flow (Prototype)</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HD Onboarding - Linear View</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --bg: #f1f5f9;
+            --card-bg: #ffffff;
+            --border: #cbd5e1;
+            --leader-color: #dc2626; 
+            --gen-color: #2563eb; 
+            --doc-color: #059669; 
+            --column-even: #f8fafc;
+            --column-odd: #ffffff;
+        }
 
-  <style>
-    :root{
-      --bg:#0b0f14;
-      --panel:#0f1620;
-      --card:#111b26;
-      --text:#e6edf3;
-      --muted:#9fb0c3;
-      --border:rgba(255,255,255,.08);
-      --accent:#f08200;
-      --line:rgba(255,255,255,.22);
-      --line2:rgba(255,255,255,.14);
-      --ok:#33d17a;
-      --warn:#ffcc00;
-    }
-    *{box-sizing:border-box}
-    body{
-      margin:0;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-      background: radial-gradient(1200px 600px at 20% 0%, rgba(240,130,0,.12), transparent 50%),
-                  radial-gradient(900px 500px at 90% 20%, rgba(80,160,255,.10), transparent 55%),
-                  var(--bg);
-      color:var(--text);
-    }
-    .wrap{ max-width:1200px; margin:0 auto; padding:22px 16px 28px; }
-    header{ display:flex; align-items:flex-start; justify-content:space-between; gap:16px; margin-bottom:14px; }
-    .title{ display:flex; flex-direction:column; gap:6px; }
-    .title h1{ margin:0; font-size:18px; letter-spacing:.2px; font-weight:700; }
-    .title p{ margin:0; color:var(--muted); font-size:13px; line-height:1.35; max-width:760px; }
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg);
+            margin: 0;
+            padding: 0;
+            color: #1e293b;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
 
-    .controls{
-      display:flex; gap:10px; align-items:center;
-      background:rgba(255,255,255,.04);
-      border:1px solid var(--border);
-      padding:10px 10px;
-      border-radius:12px;
-    }
-    label{ font-size:12px; color:var(--muted); }
-    select{
-      background:transparent; color:var(--text);
-      border:1px solid var(--border);
-      padding:8px 10px;
-      border-radius:10px;
-      font-size:13px; outline:none;
-    }
+        /* Top Bar */
+        .top-bar {
+            background: white;
+            padding: 15px 30px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
 
-    .timeline{
-      display:grid;
-      grid-template-columns: repeat(7, 1fr);
-      gap:8px;
-      margin:14px 0 14px;
-    }
-    .tchip{
-      background:rgba(255,255,255,.03);
-      border:1px solid var(--border);
-      border-radius:12px;
-      padding:10px 10px;
-      text-align:center;
-      font-size:12px;
-      color:var(--muted);
-      position:relative;
-      overflow:hidden;
-    }
-    .tchip strong{
-      display:block;
-      color:var(--text);
-      font-weight:700;
-      font-size:12px;
-      margin-bottom:2px;
-    }
+        .controls {
+            display: flex;
+            gap: 10px;
+        }
 
-    .grid{
-      display:grid;
-      grid-template-columns: 1fr 340px;
-      gap:12px;
-      align-items:start;
-    }
-    .panel{
-      background:rgba(255,255,255,.03);
-      border:1px solid var(--border);
-      border-radius:16px;
-      padding:14px;
-      min-height:560px;
-    }
-    .panel h2{
-      margin:0 0 10px;
-      font-size:13px;
-      color:var(--muted);
-      font-weight:600;
-      letter-spacing:.2px;
-    }
-    .canvasWrap{
-      border:1px solid var(--border);
-      border-radius:14px;
-      background:rgba(0,0,0,.10);
-      overflow:auto;
-      position:relative;
-    }
+        button {
+            padding: 8px 16px;
+            border: 1px solid var(--border);
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--secondary);
+            transition: all 0.2s;
+        }
 
-    .side{ display:flex; flex-direction:column; gap:12px; }
-    .card{
-      background:rgba(255,255,255,.03);
-      border:1px solid var(--border);
-      border-radius:16px;
-      padding:14px;
-    }
-    .card h3{ margin:0 0 10px; font-size:13px; color:var(--text); font-weight:700; }
-    .chips{ display:flex; flex-wrap:wrap; gap:8px; }
-    .chip{
-      border:1px solid var(--border);
-      background:rgba(255,255,255,.02);
-      border-radius:999px;
-      padding:7px 10px;
-      font-size:12px;
-      color:var(--muted);
-      display:flex;
-      align-items:center;
-      gap:8px;
-      cursor:pointer;
-      user-select:none;
-    }
-    .dot{ width:8px; height:8px; border-radius:99px; background:rgba(255,255,255,.18); }
-    .chip[data-state="ok"] .dot{ background:var(--ok); }
-    .chip[data-state="warn"] .dot{ background:var(--warn); }
-    .chip[data-state="off"] .dot{ background:rgba(255,255,255,.18); }
+        button:hover { background: #f8fafc; border-color: var(--primary); }
+        
+        button.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
 
-    .details{
-      margin-top:12px;
-      border-top:1px solid var(--border);
-      padding-top:12px;
-      color:var(--muted);
-      font-size:12.5px;
-      line-height:1.45;
-      min-height:120px;
-    }
-    .details strong{ color:var(--text); }
+        /* Main Diagram Area */
+        .diagram-wrapper {
+            flex: 1;
+            overflow: auto;
+            position: relative;
+            background: var(--bg);
+        }
 
-    @media (max-width: 980px){
-      .grid{ grid-template-columns: 1fr; }
-      .timeline{ grid-template-columns: repeat(4, 1fr); }
-    }
-  </style>
+        .grid-container {
+            display: grid;
+            /* 8 Time Columns */
+            grid-template-columns: repeat(8, minmax(200px, 1fr)); 
+            min-width: 1600px; /* Force horizontal scroll */
+            min-height: 100%;
+            position: relative;
+        }
+
+        /* Column Styles */
+        .time-column {
+            border-right: 1px dashed var(--border);
+            padding: 20px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 40px; /* Space between cards in same column */
+            padding-top: 60px; /* Space for header */
+        }
+
+        .time-column:nth-child(even) { background-color: var(--column-even); }
+        .time-column:nth-child(odd) { background-color: var(--column-odd); }
+
+        .col-header {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            padding: 15px 0;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            color: var(--secondary);
+            background: rgba(255,255,255,0.9);
+            border-bottom: 1px solid var(--border);
+            z-index: 10;
+        }
+
+        /* Cards */
+        .card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 15px;
+            position: relative;
+            z-index: 20;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            border-color: var(--primary);
+        }
+
+        .card.leader { border-top: 4px solid var(--leader-color); }
+        .card.general { border-top: 4px solid var(--gen-color); }
+        .card.docs { border-top: 4px solid var(--doc-color); }
+
+        .card h4 { margin: 0 0 5px 0; font-size: 0.95rem; }
+        .card p { margin: 0; font-size: 0.8rem; color: var(--secondary); }
+
+        /* SVG Overlay for Lines */
+        #svg-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 15; /* Behind cards, above background */
+        }
+
+        /* Modal Overlay */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 200;
+        }
+        
+        .modal {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            width: 500px;
+            max-width: 90%;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 10px;
+        }
+
+        .modal-header h2 { margin: 0; font-size: 1.5rem; }
+        .close-btn { 
+            background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--secondary); 
+        }
+
+        .modal-body h5 { margin: 15px 0 5px 0; color: var(--secondary); text-transform: uppercase; font-size: 0.75rem; }
+        .modal-body p { margin-top: 0; line-height: 1.6; }
+
+    </style>
 </head>
-
 <body>
-  <div class="wrap">
-    <header>
-      <div class="title">
-        <h1>Onboarding Flow (Prototype)</h1>
-        <p>
-          Minimal, timeline-based onboarding map. Rounded steps + thin arrow connectors.
-          Day 1 is explicitly marked. Leaders include a Go Day Plan due by Day 30.
-        </p>
-      </div>
 
-      <div class="controls">
-        <label for="persona">Persona</label>
-        <select id="persona">
-          <option value="newhire">New Hire (Employee)</option>
-          <option value="newleader">New Leader</option>
-          <option value="promotion">Promotion to Leader</option>
-        </select>
-      </div>
-    </header>
-
-    <div class="timeline" aria-label="Timeline">
-      <div class="tchip"><strong>Day 1</strong>Welcome + Contract</div>
-      <div class="tchip"><strong>Week 1</strong>Initial setup</div>
-      <div class="tchip"><strong>Week 2</strong>Role ramp</div>
-      <div class="tchip"><strong>Day 30</strong>Alignment milestone</div>
-      <div class="tchip"><strong>Day 45</strong>Checkpoint</div>
-      <div class="tchip"><strong>Day 60</strong>Checkpoint</div>
-      <div class="tchip"><strong>Day 90</strong>Outcome artifacts</div>
+    <div class="top-bar">
+        <h3>HD Onboarding Process</h3>
+        <div class="controls">
+            <button onclick="setPersona('general')" id="btn-gen">General Employee</button>
+            <button onclick="setPersona('new_leader')" id="btn-new" class="active">New Leader</button>
+            <button onclick="setPersona('promo_leader')" id="btn-promo">Promoted Leader</button>
+        </div>
     </div>
 
-    <div class="grid">
-      <section class="panel">
-        <h2>Flow Map</h2>
-        <div class="canvasWrap">
-          <!-- SVG injected here -->
-          <div id="svgHost"></div>
-        </div>
-      </section>
-
-      <aside class="side">
-        <div class="card">
-          <h3>Checkpoints (start Day 1)</h3>
-          <div class="chips" id="checkpointChips">
-            <div class="chip" data-key="employee" data-state="ok"><span class="dot"></span> Employee</div>
-            <div class="chip" data-key="leader" data-state="warn"><span class="dot"></span> Leader</div>
-            <div class="chip" data-key="docs" data-state="warn"><span class="dot"></span> Documentation</div>
-          </div>
-          <div class="details" id="details">
-            <strong>How to use:</strong> choose a persona. Click a step in the map to see details here.
-          </div>
-        </div>
-
-        <div class="card">
-          <h3>Selected Step</h3>
-          <div class="details" id="nodeInfo">
-            <strong>Nothing selected yet.</strong><br/>Click any rounded rectangle in the flow.
-          </div>
-        </div>
-      </aside>
+    <div class="diagram-wrapper">
+        <div class="grid-container" id="grid">
+            </div>
+        <svg id="svg-layer"></svg>
     </div>
-  </div>
 
-  <script>
-    // --- Layout constants (kept simple + adjustable) ---
-    const W = 1200;        // svg width
-    const H = 520;         // svg height
-    const laneTop = 60;    // where the lane grid starts
-    const laneGap = 70;    // vertical gap between lanes
-    const nodeW = 170;
-    const nodeH = 52;
-    const r = 14;          // corner radius
+    <div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+        <div class="modal" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h2 id="modal-title">Step Title</h2>
+                <button class="close-btn" onclick="closeModal()">×</button>
+            </div>
+            <div class="modal-body" id="modal-body">
+                </div>
+        </div>
+    </div>
 
-    // Time columns aligned with your header chips
-    const colX = {
-      day1: 120,
-      w1:   300,
-      w2:   480,
-      d30:  660,
-      d45:  820,
-      d60:  980,
-      d90:  1130
-    };
+    <script>
+        // --- DATA ---
+        const phases = [
+            "Trigger", "Day 1", "Week 1", "Week 2", 
+            "30 Days", "45 Days", "60 Days", "90 Days"
+        ];
 
-    const checkpointText = {
-      employee: { title:"Employee Checkpoints (Day 1+)", body:"Tracks onboarding ramp and touchpoints across Day 1, Week 1–2, and 30/45/60/90." },
-      leader:   { title:"Leader Checkpoints (Day 1+)", body:"Applies to New Leader + Promotion. Includes Go Day Plan due by Day 30 and manager review." },
-      docs:     { title:"Documentation Checkpoints (Day 1+)", body:"Tracks required documents intake/validation early in onboarding." }
-    };
+        const steps = [
+            { id: 'trig', title: "Offer Accepted", desc: "Candidate accepts via portal", phase: 0, type: 'general', roles: ['all'], 
+              context: "Trigger event. HR receives notification. Integrations fire to create user profile.", connectTo: ['doc_req', 'welc'] },
+            
+            { id: 'doc_req', title: "Request Docs", desc: "Automated checklist sent", phase: 0, type: 'docs', roles: ['all'], 
+              context: "System sends email to candidate requesting: ID, Proof of Address, Bank Info, Tax ID.", connectTo: ['sign'] },
 
-    const personaData = {
-      newhire: {
-        triggerLabel: "Trigger: Offer Accepted",
-        steps: [
-          // lane 1 (top): core flow
-          { id:"t",  label:"Offer Accepted", col:"day1", lane:0, kind:"start", detail:"Process begins when the candidate accepts the offer." },
-          { id:"w",  label:"General Welcome\n+ Contract Signed", col:"day1", lane:0, detail:"Day 1 general welcome. Contract is signed on Day 1." },
-          { id:"d",  label:"Documentation Intake", col:"day1", lane:1, tag:"Documentation", detail:"Collect and validate required onboarding documents." },
-          { id:"a",  label:"Entry Announcement", col:"w1", lane:0, detail:"Entry announcement communicated after Day 1." },
-          { id:"s1", label:"Week 1 Setup", col:"w1", lane:2, detail:"Access, tools, expectations, initial onboarding tasks." },
-          { id:"s2", label:"Week 2 Ramp", col:"w2", lane:2, detail:"Role ramp + training reinforcement." },
-          { id:"c30",label:"30-Day Check-in", col:"d30", lane:2, detail:"30-day check-in milestone." },
-          { id:"c45",label:"45-Day Check", col:"d45", lane:2, detail:"45-day progress checkpoint." },
-          { id:"c60",label:"60-Day Check", col:"d60", lane:2, detail:"60-day progress checkpoint." },
-          { id:"c90",label:"90-Day Review", col:"d90", lane:2, detail:"90-day onboarding outcomes review." }
-        ],
-        edges: [["t","w"],["w","d"],["w","a"],["d","a"],["a","s1"],["s1","s2"],["s2","c30"],["c30","c45"],["c45","c60"],["c60","c90"]],
-        checkpoints: { employee:"ok", leader:"off", docs:"warn" }
-      },
+            { id: 'welc', title: "General Welcome", desc: "Reception & IT Handoff", phase: 1, type: 'general', roles: ['all'], 
+              context: "Candidate arrives. Reception provides badge. IT provides laptop and credentials.", connectTo: ['train'] },
 
-      newleader: {
-        triggerLabel: "Trigger: Offer Accepted",
-        steps: [
-          { id:"t",  label:"Offer Accepted", col:"day1", lane:0, kind:"start", detail:"Process begins when the candidate accepts the offer." },
-          { id:"w",  label:"General Welcome\n+ Contract Signed", col:"day1", lane:0, detail:"Day 1 general welcome. Contract is signed on Day 1." },
-          { id:"d",  label:"Documentation Intake", col:"day1", lane:1, tag:"Documentation", detail:"Collect and validate required onboarding documents." },
-          { id:"a",  label:"Entry Announcement", col:"w1", lane:0, detail:"Entry announcement happens before Go Day Plan starts." },
-          { id:"m",  label:"Stakeholder Alignment", col:"d30", lane:2, detail:"Meet key stakeholders during the first 30 days to understand context and priorities." },
-          { id:"g",  label:"Go Day Plan\n(Due Day 30)", col:"d30", lane:3, tag:"Leader", detail:"Draft Go Day Plan and review with manager. Leader-only deliverable due by Day 30." },
-          { id:"c45",label:"45-Day Check", col:"d45", lane:3, detail:"Leadership progress checkpoint." },
-          { id:"c60",label:"60-Day Check", col:"d60", lane:3, detail:"Leadership progress checkpoint." },
-          { id:"c90",label:"90-Day Deliverables", col:"d90", lane:3, detail:"Action Plan + MBOs + SWOT + Team Diagnostic." }
-        ],
-        edges: [["t","w"],["w","d"],["w","a"],["d","a"],["a","m"],["m","g"],["g","c45"],["c45","c60"],["c60","c90"]],
-        checkpoints: { employee:"ok", leader:"warn", docs:"warn" }
-      },
+            { id: 'sign', title: "Sign Contract", desc: "Legal Team", phase: 1, type: 'docs', roles: ['all'], 
+              context: "Physical or Digital signature of the employment contract. Validated by Legal.", connectTo: [] },
 
-      promotion: {
-        triggerLabel: "Trigger: Promotion Confirmed",
-        steps: [
-          { id:"t",  label:"Promotion Confirmed", col:"day1", lane:0, kind:"start", detail:"Process begins when promotion is confirmed." },
-          { id:"w",  label:"General Welcome\n+ Contract Signed", col:"day1", lane:0, detail:"Day 1 general welcome. Contract/letter is signed on Day 1." },
-          { id:"a",  label:"Entry Announcement", col:"w1", lane:0, detail:"Promotion announcement communicated after Day 1." },
-          { id:"m",  label:"Stakeholder Alignment", col:"d30", lane:2, detail:"Meet key stakeholders during the first 30 days to align on priorities." },
-          { id:"g",  label:"Go Day Plan\n(Due Day 30)", col:"d30", lane:3, tag:"Leader", detail:"Draft Go Day Plan and review with manager. Leader-only deliverable due by Day 30." },
-          { id:"c45",label:"45-Day Check", col:"d45", lane:3, detail:"Leadership progress checkpoint." },
-          { id:"c60",label:"60-Day Check", col:"d60", lane:3, detail:"Leadership progress checkpoint." },
-          { id:"c90",label:"90-Day Deliverables", col:"d90", lane:3, detail:"Action Plan + MBOs + SWOT + Team Diagnostic." }
-        ],
-        edges: [["t","w"],["w","a"],["a","m"],["m","g"],["g","c45"],["c45","c60"],["c60","c90"]],
-        checkpoints: { employee:"ok", leader:"warn", docs:"off" } // adjust if promos also require docs
-      }
-    };
+            { id: 'comm_gen', title: "Entry Announcement", desc: "Standard Comms", phase: 1, type: 'general', roles: ['general'], 
+              context: "HR sends 'New Joiner' email to the immediate team and department.", connectTo: ['train'] },
 
-    function svgEl(tag, attrs={}){
-      const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
-      Object.entries(attrs).forEach(([k,v]) => el.setAttribute(k, v));
-      return el;
-    }
+            { id: 'comm_lead', title: "Leadership Announce", desc: "Org-wide Comms", phase: 1, type: 'leader', roles: ['new_leader'], 
+              context: "HR/VP sends organization-wide email introducing the new leader.", connectTo: ['go_day'] },
 
-    function drawFlow(personaKey){
-      const data = personaData[personaKey];
-      const host = document.getElementById("svgHost");
-      host.innerHTML = "";
+            { id: 'comm_promo', title: "Promotion Announce", desc: "Internal Comms", phase: 1, type: 'leader', roles: ['promo_leader'], 
+              context: "Announcement of internal promotion sent to the company.", connectTo: ['go_day'] },
 
-      // Update checkpoint states
-      document.querySelectorAll(".chip").forEach(chip=>{
-        const key = chip.dataset.key;
-        chip.dataset.state = data.checkpoints[key] || "warn";
-      });
+            { id: 'train', title: "Core Training", desc: "LMS Modules", phase: 2, type: 'general', roles: ['all'], 
+              context: "Mandatory modules: Compliance, Data Security, Code of Conduct.", connectTo: ['intro'] },
 
-      // Build SVG
-      const svg = svgEl("svg", { width: W, height: H, viewBox:`0 0 ${W} ${H}`, role:"img" });
+            { id: 'intro', title: "Team Intros", desc: "1:1 Meetings", phase: 3, type: 'general', roles: ['all'], 
+              context: "Scheduled 1:1s with immediate team members and key cross-functional partners.", connectTo: [] },
 
-      // Arrow marker
-      const defs = svgEl("defs");
-      const marker = svgEl("marker", {
-        id:"arrow",
-        viewBox:"0 0 10 10",
-        refX:"9",
-        refY:"5",
-        markerWidth:"6",
-        markerHeight:"6",
-        orient:"auto-start-reverse"
-      });
-      marker.appendChild(svgEl("path",{ d:"M 0 0 L 10 5 L 0 10 z", fill:"rgba(255,255,255,.28)" }));
-      defs.appendChild(marker);
-      svg.appendChild(defs);
+            { id: 'go_day', title: "Go Day Plan", desc: "Create 30-Day Strategy", phase: 4, type: 'leader', roles: ['new_leader', 'promo_leader'], 
+              context: "<b>Leader Only:</b> Create a structured plan for the first 30 days. <br><b>Deliverable:</b> Draft presentation reviewed by Manager.", connectTo: ['rev_60'] },
 
-      // Lanes background lines (subtle)
-      for(let i=0;i<5;i++){
-        const y = laneTop + i*laneGap;
-        svg.appendChild(svgEl("line", { x1:40, y1:y, x2:W-40, y2:y, stroke:"rgba(255,255,255,.06)" }));
-      }
+            { id: 'rev_30', title: "30-Day Check", desc: "HR BP Check-in", phase: 4, type: 'general', roles: ['general'], 
+              context: "Casual check-in to ensure access to tools and integration into culture.", connectTo: [] },
 
-      // Day 1 vertical marker
-      const day1X = colX.day1;
-      svg.appendChild(svgEl("line", {
-        x1:day1X, y1:20, x2:day1X, y2:H-20,
-        stroke:"rgba(240,130,0,.45)", "stroke-width":"2"
-      }));
-      const day1Label = svgEl("text", {
-        x: day1X + 10, y: 28,
-        fill:"rgba(240,130,0,.95)",
-        "font-size":"12", "font-weight":"700"
-      });
-      day1Label.textContent = "DAY 1 START";
-      svg.appendChild(day1Label);
+            { id: 'rev_60', title: "60-Day Review", desc: "Plan Execution Check", phase: 6, type: 'leader', roles: ['new_leader', 'promo_leader'], 
+              context: "Review progress against the Go Day Plan. Adjust priorities if needed.", connectTo: ['final_90'] },
 
-      // Compute node positions
-      const pos = {};
-      data.steps.forEach(s=>{
-        const x = colX[s.col] - nodeW/2;
-        const y = laneTop + s.lane*laneGap;
-        pos[s.id] = { x, y };
-      });
+            { id: 'final_90', title: "90-Day Deliverables", desc: "MBOs & SWOT", phase: 7, type: 'leader', roles: ['new_leader', 'promo_leader'], 
+              context: "<b>Final Output:</b><br>- Full Action Plan<br>- MBOs defined<br>- SWOT Analysis<br>- Team Diagnostic", connectTo: [] },
+            
+            { id: 'probation', title: "Probation Review", desc: "Confirm Employment", phase: 7, type: 'general', roles: ['general'], 
+              context: "Formal review to confirm end of probation period.", connectTo: [] }
+        ];
 
-      // Draw edges (thin lines + arrow head)
-      data.edges.forEach(([from,to])=>{
-        const a = pos[from], b = pos[to];
-        const x1 = a.x + nodeW, y1 = a.y + nodeH/2;
-        const x2 = b.x,         y2 = b.y + nodeH/2;
+        let currentRole = 'new_leader';
 
-        // Slight curve via quadratic path
-        const midX = (x1 + x2)/2;
-        const d = `M ${x1} ${y1} Q ${midX} ${y1} ${x2} ${y2}`;
-
-        svg.appendChild(svgEl("path", {
-          d,
-          fill:"none",
-          stroke:"rgba(255,255,255,.22)",
-          "stroke-width":"1.2",
-          "marker-end":"url(#arrow)"
-        }));
-      });
-
-      // Draw nodes (rounded rectangles)
-      data.steps.forEach(s=>{
-        const {x,y} = pos[s.id];
-
-        const group = svgEl("g", { "data-id": s.id, style:"cursor:pointer" });
-
-        // Glow border for special tags
-        const stroke = s.tag === "Leader" ? "rgba(240,130,0,.55)"
-                     : s.tag === "Documentation" ? "rgba(80,160,255,.45)"
-                     : "rgba(255,255,255,.16)";
-
-        group.appendChild(svgEl("rect", {
-          x, y, width:nodeW, height:nodeH, rx:r, ry:r,
-          fill:"rgba(255,255,255,.03)",
-          stroke:stroke,
-          "stroke-width":"1.2"
-        }));
-
-        // Title text (multi-line)
-        const lines = s.label.split("\n");
-        lines.forEach((line, idx)=>{
-          const t = svgEl("text",{
-            x: x + 12,
-            y: y + 20 + idx*14,
-            fill:"#e6edf3",
-            "font-size":"12",
-            "font-weight": idx===0 ? "700":"500"
-          });
-          t.textContent = line;
-          group.appendChild(t);
-        });
-
-        // Small tag pill (optional)
-        if (s.tag){
-          const pillText = s.tag;
-          const pillW = 90;
-          group.appendChild(svgEl("rect",{
-            x: x + nodeW - pillW - 10,
-            y: y + 10,
-            width: pillW,
-            height: 18,
-            rx: 999, ry: 999,
-            fill: s.tag==="Leader" ? "rgba(240,130,0,.12)" : "rgba(80,160,255,.10)",
-            stroke: "rgba(255,255,255,.10)"
-          }));
-          const pt = svgEl("text",{
-            x: x + nodeW - pillW - 10 + 10,
-            y: y + 23,
-            fill:"rgba(230,237,243,.92)",
-            "font-size":"11",
-            "font-weight":"600"
-          });
-          pt.textContent = pillText;
-          group.appendChild(pt);
+        // --- RENDER LOGIC ---
+        function init() {
+            setPersona('new_leader');
+            window.addEventListener('resize', drawLines);
         }
 
-        // Start dot for first node
-        if (s.kind === "start"){
-          group.appendChild(svgEl("circle",{
-            cx: x - 10,
-            cy: y + nodeH/2,
-            r: 5,
-            fill: "rgba(240,130,0,.85)"
-          }));
-          group.appendChild(svgEl("line",{
-            x1: x - 5, y1: y + nodeH/2,
-            x2: x,     y2: y + nodeH/2,
-            stroke:"rgba(240,130,0,.55)", "stroke-width":"2"
-          }));
+        function setPersona(role) {
+            currentRole = role;
+            document.querySelectorAll('.controls button').forEach(b => b.classList.remove('active'));
+            if(role === 'general') document.getElementById('btn-gen').classList.add('active');
+            if(role === 'new_leader') document.getElementById('btn-new').classList.add('active');
+            if(role === 'promo_leader') document.getElementById('btn-promo').classList.add('active');
+            render();
         }
 
-        group.addEventListener("click", ()=>{
-          document.getElementById("nodeInfo").innerHTML =
-            `<strong>${s.label.replaceAll("\n"," — ")}</strong><br/><br/>${s.detail || "No details yet."}`;
-        });
+        function render() {
+            const container = document.getElementById('grid');
+            container.innerHTML = '';
 
-        svg.appendChild(group);
-      });
+            // 1. Build Columns
+            const columns = [];
+            for(let i=0; i<8; i++) {
+                const col = document.createElement('div');
+                col.className = 'time-column';
+                col.innerHTML = `<div class="col-header">${phases[i]}</div>`;
+                container.appendChild(col);
+                columns.push(col);
+            }
 
-      host.appendChild(svg);
+            // 2. Filter & Place Cards
+            const visibleSteps = steps.filter(s => s.roles.includes('all') || s.roles.includes(currentRole));
+            
+            visibleSteps.forEach(step => {
+                const card = document.createElement('div');
+                card.className = `card ${step.type}`;
+                card.id = `card-${step.id}`;
+                card.innerHTML = `<h4>${step.title}</h4><p>${step.desc}</p>`;
+                card.onclick = () => openModal(step);
+                
+                // Append to correct column
+                columns[step.phase].appendChild(card);
+            });
 
-      // Default right panel text
-      document.getElementById("nodeInfo").innerHTML =
-        `<strong>${data.triggerLabel}</strong><br/><br/>Click any step to view details.`;
-    }
+            // 3. Draw Lines (after DOM layout)
+            setTimeout(() => drawLines(visibleSteps), 50);
+        }
 
-    // Chip details
-    document.getElementById("checkpointChips").addEventListener("click",(e)=>{
-      const chip = e.target.closest(".chip");
-      if(!chip) return;
-      const info = checkpointText[chip.dataset.key];
-      document.getElementById("details").innerHTML =
-        `<strong>${info.title}</strong><br/><br/>${info.body}`;
-    });
+        function drawLines(visibleSteps) {
+            const svg = document.getElementById('svg-layer');
+            svg.innerHTML = `
+                <defs>
+                    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+                        <path d="M0,0 L0,6 L9,3 z" fill="#94a3b8" />
+                    </marker>
+                </defs>
+            `;
 
-    // Persona selector
-    const personaSelect = document.getElementById("persona");
-    personaSelect.addEventListener("change", ()=> drawFlow(personaSelect.value));
+            // If we didn't pass steps, filter them again
+            if(!visibleSteps) {
+                visibleSteps = steps.filter(s => s.roles.includes('all') || s.roles.includes(currentRole));
+            }
 
-    // Initial
-    drawFlow("newhire");
-  </script>
+            visibleSteps.forEach(source => {
+                source.connectTo.forEach(targetId => {
+                    // Is target visible?
+                    if(!visibleSteps.find(s => s.id === targetId)) return;
+
+                    const startEl = document.getElementById(`card-${source.id}`);
+                    const endEl = document.getElementById(`card-${targetId}`);
+
+                    if(startEl && endEl) {
+                        drawLinearPath(svg, startEl, endEl);
+                    }
+                });
+            });
+        }
+
+        function drawLinearPath(svg, startEl, endEl) {
+            const svgRect = svg.getBoundingClientRect();
+            const sRect = startEl.getBoundingClientRect();
+            const eRect = endEl.getBoundingClientRect();
+
+            const x1 = sRect.right - svgRect.left;
+            const y1 = sRect.top + sRect.height/2 - svgRect.top;
+            const x2 = eRect.left - svgRect.left;
+            const y2 = eRect.top + eRect.height/2 - svgRect.top;
+
+            // Orthogonal Routing Logic
+            // Go right half-way, then up/down, then right to target
+            const midX = x1 + (x2 - x1) / 2;
+            
+            // Create Polyline string
+            const points = `${x1},${y1} ${midX},${y1} ${midX},${y2} ${x2},${y2}`;
+
+            const polyline = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
+            polyline.setAttribute("points", points);
+            polyline.setAttribute("fill", "none");
+            polyline.setAttribute("stroke", "#94a3b8");
+            polyline.setAttribute("stroke-width", "2");
+            polyline.setAttribute("marker-end", "url(#arrow)");
+
+            svg.appendChild(polyline);
+        }
+
+        // --- MODAL ---
+        function openModal(stepData) {
+            document.getElementById('modal-title').innerText = stepData.title;
+            document.getElementById('modal-body').innerHTML = `
+                <h5>Description</h5>
+                <p>${stepData.context}</p>
+                <h5>Phase</h5>
+                <p>${phases[stepData.phase]}</p>
+                <h5>Owner</h5>
+                <p>${stepData.type.toUpperCase()}</p>
+            `;
+            document.getElementById('modal-overlay').style.display = 'flex';
+        }
+
+        function closeModal(e) {
+            if(e) e.stopPropagation(); // prevent clicking through
+            document.getElementById('modal-overlay').style.display = 'none';
+        }
+
+        // Start
+        init();
+
+    </script>
 </body>
 </html>
